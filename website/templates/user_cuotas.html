@@ -1,0 +1,70 @@
+{% extends "base.html" %} {% block title %} Cuotas SAOS{% endblock %}
+
+{% block main_content %}
+<div style="width:90vw; padding-left:2rem;">
+    <div uk-grid class="uk-child-width-expand">
+        <ul class="uk-tab-left uk-width-1-6" uk-tab style="padding-left: 1rem;" uk-tab>
+            {% for cliente in clientes %}
+            <!-- Iterar sobre cada cliente en cuotas.cliente -->
+            <li id="{{ cliente }}" class="uk-active uk-width-auto">
+                <!-- Usar el nombre del cliente como ID y para el atributo href -->
+                <a href="#{{ 'tab' ~ cliente }}">{{ cliente }}</a>
+            </li>
+            {% endfor %}
+        </ul>
+        <ul class="uk-switcher uk-margin" class="uk-width-6-6;">
+            {%for cliente in clientes %}
+            <li id="{{'tab'+cliente+'li'}}">
+                <div id="{{'tab'+cliente}}" style="padding-left: 0.5rem; width:100%;">
+                    <table id="tabla-{{cliente}}" class="uk-table uk-table-small uk-table-divider tabla-cuotas-user">
+                        <thead>
+                            <tr>
+                                <th>Cliente</th>
+                                <th>Valor cuota</th>
+                                <th>Proyecto</th>
+                                <th>Lote</th>
+                                <th>Fecha inicio</th>
+                                <th>Cuotas totales</th>
+                                <th>Número de cuota</th>
+                                <th>Fecha a pagar</th>
+                                <th>Estado del pago</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for cuota in cuotas if cuota.cliente == cliente %}
+                            <tr>
+                                <td>{{cuota.cliente}}</td>
+                                <td>{{cuota.cuotadolar}}</td>
+                                <td>{{cuota.proyecto}}</td>
+                                <td>{{cuota.lote}}</td>
+                                <td>{{cuota.fecha}}</td>
+                                <td>{{cuota.numcuotas}}</td>
+                                <td>{{cuota.idcuota}}</td>
+                                <td>{{cuota.fechacuota}}</td>
+                                <td>{{cuota.estadocuota}}</td>
+                            </tr>
+                            {%endfor%}
+                        </tbody>
+                    </table>
+                </div>
+            </li>
+            {%endfor%}
+        </ul>
+    </div>
+</div>
+<script>
+    // Configuración de DataTables
+    $('.tabla-cuotas-user').each(function () {
+        // Inicializar DataTables para cada tabla encontrada
+        var table = $(this).DataTable({
+            paging: true,
+            pageLength: 7, // Número de filas por página
+            lengthChange: false, // Ocultar selector de cantidad de filas por página
+            searching: false, // Ocultar barra de búsqueda
+            info: false, // Ocultar información de la tabla
+            ordering: true // Desactivar ordenamiento de columnas
+        });
+    });
+
+</script>
+{%endblock%}

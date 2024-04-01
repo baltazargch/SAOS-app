@@ -1,0 +1,352 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@500&display=swap");
+* {
+  margin: 0;
+  padding: 0;
+  font-family: "poppins", sans-serif;
+}
+
+.container-all {
+  display: block;
+}
+
+.wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  width: 100%;
+  background-position: center;
+  background-size: cover;
+  z-index: 0;
+}
+.wrapper .form-box {
+  position: relative;
+  width: 90%;
+  height: 350px;
+  background: transparent;
+  border: 2px solid rgba(255, 255, 255, 0.5);
+  border-radius: 20px;
+  backdrop-filter: blur(10px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1;
+}
+.wrapper .form-box-singup {
+  position: relative;
+  width: 400px;
+  height: 350px;
+  background: transparent;
+  border: 2px solid rgba(255, 255, 255, 0.5);
+  border-radius: 20px;
+  backdrop-filter: blur(10px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.wrapper h2 {
+  font-size: 2em;
+  color: #fff;
+  text-align: center;
+}
+.wrapper .inputbox {
+  position: relative;
+  margin: 30px 0;
+  width: 310px;
+  border-bottom: 2px solid #fff;
+}
+.wrapper .inputbox label {
+  /* position: absolute; */
+  /* top: 50%; */
+  /*  left: 5px; */
+  /* transform: translateY(-50%); */
+  color: #fff;
+  font-size: 1em;
+  /* pointer-events: none;
+  transition: 0.5s; */
+}
+
+/* .wrapper input:focus ~ label,
+input:valid ~ label {
+  top: -15px;
+} */
+
+.wrapper .inputbox input {
+  width: 100%;
+  height: 50px;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-size: 1em;
+  padding: 0 35px 0 5px;
+  color: #fff;
+}
+
+.wrapper .inputbox ion-icon {
+  position: absolute;
+  right: 8px;
+  color: #fff;
+  font-size: 1.2em;
+  top: 20px;
+}
+.wrapper .forget {
+  margin: -15px 0 15px;
+  font-size: 0.9em;
+  color: #fff;
+  display: flex;
+  justify-content: space-between;
+}
+
+.wrapper .forget a {
+  color: #fff;
+  text-decoration: none;
+  font-weight: 500;
+}
+.wrapper .forget a:hover {
+  text-decoration: underline;
+}
+.wrapper .forget label input {
+  margin-right: 3px;
+}
+.wrapper .forget label a {
+  color: #fff;
+  text-decoration: none;
+}
+.wrapper .forget label a:hover {
+  text-decoration: underline;
+}
+.wrapper button {
+  width: 100%;
+  height: 40px;
+  border-radius: 40px;
+  background: #fff;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  font-size: 1em;
+  font-weight: 600;
+}
+.wrapper .register {
+  font-size: 0.9em;
+  color: #fff;
+  text-align: center;
+  margin: 25px 0 10px;
+}
+.wrapper .register p a {
+  text-decoration: none;
+  color: #fff;
+  font-weight: 500;
+}
+.wrapper .register p a:hover {
+  text-decoration: underline;
+}
+
+#background-video {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -2;
+  object-fit: fill;
+  padding: 0 10px 0 5px;
+}
+
+/* Styles for modal map users */
+.uk-modal-dialog {
+  border-radius: 20px;
+}
+
+.wrapper-modal-lotes {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 500px;
+  width: 100%;
+  border-radius: 20px;
+  background: #ada996; /* fallback for old browsers */
+  background: -webkit-linear-gradient(
+    to right,
+    #eaeaea,
+    #dbdbdb,
+    #f2f2f2,
+    #ada996
+  ); /* Chrome 10-25, Safari 5.1-6 */
+  background: linear-gradient(
+    to right,
+    #eaeaea,
+    #dbdbdb,
+    #f2f2f2,
+    #ada996
+  ); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+  background-position: center;
+  background-size: cover;
+}
+
+.wrapper-modal-lotes .form-modal-value {
+  position: relative;
+  width: 100%;
+  height: 500px;
+  background: transparent;
+  border: 2px solid rgba(255, 255, 255, 0.5);
+  border-radius: 20px;
+  backdrop-filter: blur(10px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.wrapper-modal-lotes button {
+  width: 100%;
+}
+
+.wrapper-modal-lotes .inputbox input {
+  width: 85%;
+  height: 40px;
+  background: #ffffffd7;
+  border-color: transparent;
+  outline: 2px solid transparent;
+  font-size: 1em;
+  padding: 0 35px 0 5px;
+  color: #242424;
+}
+
+.no-user-cols {
+  display: flex;
+  height: 600px;
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+  background-color: transparent;
+}
+
+.col-content {
+  display: flex;
+  flex-direction: column;
+  overflow: hide;
+  width: 20%;
+}
+
+.lista-loteos {
+  width: 100%;
+  height: 100%;
+}
+
+.lista-loteos h3 {
+  background-color: #e8dbdb00;
+  font-size: 22px;
+  color: rgb(29, 29, 29);
+  font-weight: 700;
+  padding: 0.5em 0.5em;
+  text-align: left;
+  border-bottom: 2px solid #387c6c;
+}
+
+#mapLot {
+  width: 80%;
+  height: 100%;
+}
+
+.lista-loteos ul.items-loteos {
+  list-style-type: none;
+  width: 90%;
+  padding-left: 1em;
+}
+
+.lista-loteos a {
+  text-decoration: none;
+  font-size: 16px;
+  color: rgb(32, 32, 32);
+  font-weight: 700;
+}
+
+.lista-loteos .item-loteo {
+  border-bottom: 1px solid;
+}
+
+.uk-heading-bullet::before {
+  content: "";
+  display: inline-block;
+  position: relative;
+  top: calc(-0.1 * 1em);
+  vertical-align: middle;
+  height: calc(4px + 0.8em);
+  margin-right: calc(5px + 0.2em);
+  border-left: calc(2px + 0.16em) solid #00be91;
+}
+
+.leaflet-popup-content .image-button {
+  width: 150px; /* Set the width of the button */
+  height: 70px; /* Set the height of the button */
+  background-size: 90% auto; /* Cover the entire button with the background image */
+  background-position: center; /* Center the background image */
+  background-repeat: no-repeat;
+  border: 2px solid #6c6c6c; /* Remove button border */
+  cursor: pointer;
+  border-radius: 20px;
+  background-color: #131f1c49;
+}
+
+/* Media query for mobile devices */
+@media (max-width: 768px) {
+  #mapLot {
+    width: 70%;
+  }
+
+  .col-content {
+    width: 30%;
+  }
+
+  .lista-loteos a {
+    text-decoration: none;
+    font-size: 12px;
+    color: rgb(32, 32, 32);
+    font-weight: 600;
+  }
+
+  .lista-loteos h3 {
+    background-color: #e8dbdb00;
+    font-size: 14px;
+    border-bottom: 2px solid #387c6c;
+  }
+}
+
+.dash__div a:hover {
+  text-decoration: none;
+}
+
+.dash__div,
+h1,
+p {
+  color: #242424;
+}
+
+.dash__div a:hover h3 {
+  font-weight: 500;
+}
+
+.dash__div a:hover h2 {
+  font-weight: 500;
+}
+
+.dash__div a:hover p {
+  font-weight: 600;
+}
+
+.dash__div a:hover .uk-card {
+  transform: scale(1.05); /* Aplica una transformación al realizar un hover */
+  z-index: 2; /* Ajusta el z-index en hover */
+}
+
+.dash__div .uk-card {
+  transition: transform 0.3s ease, z-index 0.3s ease;
+  z-index: 1;
+}
+
+.dash__div .ion-icon-xl {
+  font-size: 4rem;
+}
+
+.admin__dash .ion-icon-xl {
+  padding-top: 1.5rem;
+}

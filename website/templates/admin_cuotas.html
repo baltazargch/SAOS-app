@@ -1,0 +1,121 @@
+{% extends "base.html" %} {% block title %}Bienvenido a SAOS{% endblock %}
+
+{% block main_content %}
+
+<div style="display:flex; padding-left: 2rem; padding-top: 0.5rem; width: 95vw; height: 70vh;">
+    <div style="border-right: 1px solid rgba(0,0,0,0.2); padding-right:2rem; width:25%;">
+        {% if usuarios_loteos != '' %}
+        <form action="/nuevo_cliente" method='POST'>
+            <fieldset class="uk-fieldset">
+                <br>
+                <legend class="uk-legend">Agregar plan de cuotas para:</legend>
+                <div class="uk-form-controls">
+                    <div class="uk-margin">
+                        <select id="userLotes" class="uk-select" aria-label="Select" name="userLotes">
+                            {%for userLot in usuarios_loteos %}
+                            <option value="{{ userLot.id }}"> {{ userLot.nombre + ' ' + userLot.apellido }}
+                            </option>
+                            {%endfor%}
+                        </select>
+                        <br>
+                        <br>
+                        <div class="uk-form-controls">
+                            <label class="uk-form-label" for="form-stacked-text">Cliente</label>
+                            <input type="text" class="uk-input" name="cliente" placeholder="Nombres de comprador@s">
+                        </div>
+                        <div class="uk-form-controls">
+                            <label class="uk-form-label" for="form-stacked-text">Proyecto de loteo</label>
+                            <input type="text" class="uk-input" name="proyecto" placeholder="Nombre del loteo">
+                        </div>
+                        <div class="uk-form-controls">
+                            <label class="uk-form-label" for="form-stacked-text">Lote</label>
+                            <input type="text" class="uk-input" name="lote" placeholder="Nombre del lote">
+                        </div>
+                        <div class="uk-form-controls">
+                            <label class="uk-form-label" for="form-stacked-text">Cuotas</label>
+                            <input type="number" class="uk-input" name="cuotas" placeholder="Número de cuotas" step="1"
+                                min="0">
+                        </div>
+                        <div class="uk-form-controls">
+                            <label class="uk-form-label" for="form-stacked-text">Fecha primera cuota</label>
+                            <input type="date" class="uk-input" name="fechaini" placeholder="Inicio de plan de cuotas">
+                        </div>
+                        <div class="uk-form-controls">
+                            <label class="uk-form-label" for="form-stacked-text">Valor de cuotas (USD)</label>
+                            <input type="number" class="uk-input" name="valorcuotas"
+                                placeholder="Valor de cada cuota en dólares">
+                        </div>
+                    </div>
+                </div>
+            </fieldset>
+            <button type="submit" class="uk-button uk-button-secondary .uk-width-1-1">Agregar</button>
+        </form>
+        {% else %}
+        <p class="uk-text-warning"> Actualmente no hay usuarios con permisos de loteos </p>
+        {%endif%}
+    </div>
+    <div style="padding-left: 0.5rem; width:75%;">
+        <table id="tabla-cuotas" class="uk-table uk-table-small uk-table-divider">
+            <thead>
+                <tr>
+                    <th>Usuario</th>
+                    <th>Cliente</th>
+                    <th>Valor cuota</th>
+                    <th>Proyecto</th>
+                    <th>Lote</th>
+                    <th>Fecha inicio</th>
+                    <th>Cuotas totales</th>
+                    <th>Número de cuota</th>
+                    <th>Fecha a pagar</th>
+                    <th>Estado del pago</th>
+                </tr>
+            </thead>
+            <tbody>
+                {%if cuotas_usuario != ''%}
+                {%for cuota in cuotas_usuario %}
+                <tr>
+                    <td>{{ cuota.user.nombre + ' ' + cuota.user.apellido }}</td>
+                    <td>{{cuota.cliente}}</td>
+                    <td>{{cuota.cuotadolar}}</td>
+                    <td>{{cuota.proyecto}}</td>
+                    <td>{{cuota.lote}}</td>
+                    <td>{{ cuota.fecha }}</td>
+                    <td>{{cuota.numcuotas}}</td>
+                    <td>{{cuota.idcuota}}</td>
+                    <td>{{cuota.fechacuota}}</td>
+                    <td>{{cuota.estadocuota}}</td>
+                </tr>
+                {%endfor%}
+                {%endif%}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    // Configuración de DataTables
+    $(document).ready(function () {
+        // Inicializar DataTables
+        var table = $("#tabla-cuotas").DataTable({
+            // Configuración de paginación
+            columnDefs: [
+                {
+                    targets: [0, 1, 3],
+                    searchable: true
+                },
+                {
+                    targets: [2, 4, 5, 6, 7, 8, 9],
+                    searchable: false
+                }
+            ],
+            paging: true,
+            pageLength: 7, // Número de filas por página
+            lengthChange: false, // Ocultar selector de cantidad de filas por página
+            searching: true, // Ocultar barra de búsqueda
+            info: false, // Ocultar información de la tabla
+            ordering: false, // Desactivar ordenamiento de columnas
+        });
+    });
+
+</script>
+{%endblock%}

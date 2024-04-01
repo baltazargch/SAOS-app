@@ -1,0 +1,19 @@
+{%extends "base.html" %}{% block title %}Loteos - invitado{% endblock %}
+
+{% block main_content %}
+
+<div class="no-user-cols">
+    <div class="col-content">
+        <div class="lista-loteos">
+            <h3 class="uk-heading-bullet uk-font-default"> 
+                <span class="uk-text-background">Loteos SAOS</span>
+            </h3>
+            <ul class="items-loteos"></ul>
+        </div>
+    </div>
+    <div id="mapLot"></div>
+</div>
+
+<script type="text/javascript" src="{{ url_for('static', filename='js/map-no-user.js')}}"> </script>
+
+{%endblock%}

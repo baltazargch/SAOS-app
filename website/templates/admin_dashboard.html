@@ -1,0 +1,104 @@
+{% extends "base.html" %} {% block title %}Bienvenido a SAOS{% endblock %}
+
+{% block main_content %}
+<div class="dash__div" style="padding: 0.5rem 5em;">
+    <h1 class="uk-heading-bullet uk-font-default">
+        <span class="uk-text-background" style="font-size: smaller;">{{ current_user.nombre.upper() }}: Bienvenid@ a tu
+            portal SAOS.</span>
+    </h1>
+    <div class="uk-text-background uk-text-default">
+        Su rol actual es {{ current_user.tipo.upper() }}: A continuación, encontrarás las acciones disponbiles.
+    </div>
+    <hr>
+    <br>
+    <div>
+        <div class="uk-child-width-1-1@s uk-child-width-1-3@m uk-text-center admin__dash" uk-grid="masonry: pack"
+            style="font-size: smaller;">
+            <div>
+                <a href="/sing_up">
+                    <div class="uk-card uk-card-hover">
+                        <div class="uk-card-media-top"
+                            style="display: flex; justify-content: center ;align-items: center;">
+                            <ion-icon name="person-add-outline" class="ion-icon-xl"></ion-icon>
+                        </div>
+                        <div class="uk-card-body">
+                            <h2 class="uk-card-title">Agregar o modificar usuario</h2>
+                            <p>Agrega o modifica usuarios y define sus roles</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            <div>
+                <a href="/admincuotas">
+                    <div class="uk-card uk-card-hover">
+                        <div class="uk-card-media-top"
+                            style="display: flex; justify-content: center ;align-items: center;">
+                            <ion-icon name="calendar-outline" class="ion-icon-xl"></ion-icon>
+                        </div>
+                        <div class="uk-card-body">
+                            <h3 class="uk-card-title">Agregar un plan de pago</h3>
+                            <p>Para usuarios con loteos, agregar cliente, plan de pago, número de cuotas y más.</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            <div>
+                <a href="#">
+                    <div class="uk-card uk-card-hover">
+                        <div class="uk-card-media-top"
+                            style="display: flex; justify-content: center ;align-items: center;">
+                            <ion-icon name="home-outline" class="ion-icon-xl"></ion-icon>
+                        </div>
+                        <div class="uk-card-body">
+                            <h3 class="uk-card-title">Construcción</h3>
+                            <p>Para usuarios de construcción, agrega y modifica información o descarga informes.</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            <div>
+                <a href="#">
+                    <div class="uk-card uk-card-hover">
+                        <div class="uk-card-media-top"
+                            style="display: flex; justify-content: center ;align-items: center;">
+                            <ion-icon name="map-outline" class="ion-icon-xl"></ion-icon>
+                        </div>
+                        <div class="uk-card-body">
+                            <h3 class="uk-card-title">Agregar un nuevo mapa</h3>
+                            <p>Agrega un nuevo loteo a la base de datos y selecciona los usuarios con acceso.</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            <!-- segunda fila -->
+            <div>
+                <a href="#">
+                    <div class="uk-card uk-card-hover">
+                        <div class="uk-card-media-top"
+                            style="display: flex; justify-content: center ;align-items: center;">
+                            <ion-icon name="receipt-outline" class="ion-icon-xl"></ion-icon>
+                        </div>
+                        <div class="uk-card-body">
+                            <h3 class="uk-card-title">Registrar un pago de cuotas</h3>
+                            <p>Agrega un nuevo pago y emite una factura para pagos de cuotas en loteos.</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            <div>
+                <a href="/admin_descargas">
+                    <div class="uk-card uk-card-hover">
+                        <div class="uk-card-media-top"
+                            style="display: flex; justify-content: center ;align-items: center;">
+                            <ion-icon name="download-outline" class="ion-icon-xl"></ion-icon>
+                        </div>
+                        <div class="uk-card-body">
+                            <h3 class="uk-card-title">Descargar información</h3>
+                            <p>Visualiza, filtra y descarga datos.</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+    {% endblock %}

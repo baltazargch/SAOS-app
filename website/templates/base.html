@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- add icon title -->
+    <link rel="icon" href="static/media/saos-nuevo-negro.svg" type="image/x-icon">
+
+    <!-- UIkit CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/uikit@3.19.2/dist/css/uikit.min.css" />
+
+    <!-- UIkit JS -->
+    <script src="https://cdn.jsdelivr.net/npm/uikit@3.19.2/dist/js/uikit.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/uikit@3.19.2/dist/js/uikit-icons.min.js"></script>
+
+    <!-- Leaflet -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
+
+    <!-- DataTables JavaScript -->
+    <script type="text/javascript" charset="utf8"
+        src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+
+    <!-- link css home page -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css')}}">
+
+
+
+    <title>{% block title %}Inicio{% endblock %}</title>
+</head>
+
+<body>
+    <nav class="uk-navbar-container">
+        <div class="uk-container">
+            <div uk-navbar>
+                <div class="uk-navbar-left">
+                    <ul class="uk-navbar-nav">
+                        <li><a href="/">Inicio</a></li>
+                        {% if user.is_authenticated %}
+                        <li> <a href="/dashboard">Mis servicios</a> </li>
+                        {%endif%}
+                        {% if user.tipo == 'admin' %}
+                        <li> <a href="/admindashboard">Admin SAOS</a> </li>
+                        {%endif%}
+                    </ul>
+                </div>
+                <div style="display:flex; align-items:center; justify-content:center; width:100%;">
+                    <a class="uk-navbar-item uk-logo" href="https://saos.app/">
+                        <img src="{{ url_for('static', filename='/media/saos-nuevo-negro.svg') }}"
+                            style="height: 1.5rem; width:auto; display: inline-block;" alt="saos-logo">
+                    </a>
+                </div>
+
+                <div class="uk-navbar-right">
+                    <ul class="uk-navbar-nav">
+                        {% if not user.is_authenticated %}
+                        <li><a href="/login">Acceder</a></li>
+                        {% else %}
+                        <!--  <li><a href="/maps_users">Mis loteos</a></li> -->
+                        <li><a href="/logout">Salir<ion-icon name="log-out-outline"></ion-icon></a></li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    {%for category, message in messages%}
+    {% if category == 'error' %}
+    <div id='alert-error' class="uk-alert-danger" uk-alert>
+        <a href class="uk-alert-close" uk-close></a>
+        <p> {{ message }} </p>
+        </button>
+    </div>
+    {%else%}
+    <div id='alert-sucess' class="uk-alert-success" uk-alert>
+        <a href class="uk-alert-close" uk-close></a>
+        <p> {{ message }} </p>
+        </button>
+    </div>
+    {%endif%}
+    {%endfor%}
+    {%endif%}
+    {%endwith%}
+
+    <div class="container-all">
+        {% block main_content %}{% endblock %}
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+        integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+        crossorigin="anonymous"></script>
+
+    <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+
+</body>
+
+</html>

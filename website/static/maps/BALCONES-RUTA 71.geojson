@@ -1,0 +1,13 @@
+{
+"type": "FeatureCollection",
+"name": "BALCONES-RUTA 71",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+"features": [
+{ "type": "Feature", "properties": { "id": 1, "loteo": "BALCONES-RUTA 71", "nombrecompleto": "PARCELA A", "estado": "DISPONIBLE", "area": 4837.0 }, "geometry": { "type": "Polygon", "coordinates": [ [ [ -71.477211, -43.02645 ], [ -71.47787, -43.026943 ], [ -71.477305, -43.027353 ], [ -71.476786, -43.026966 ], [ -71.476856, -43.026915 ], [ -71.476714, -43.026809 ], [ -71.477211, -43.02645 ] ] ] } },
+{ "type": "Feature", "properties": { "id": 2, "loteo": "BALCONES-RUTA 71", "nombrecompleto": "PARCELA B", "estado": "DISPONIBLE", "area": 4827.0 }, "geometry": { "type": "Polygon", "coordinates": [ [ [ -71.476479, -43.025904 ], [ -71.477211, -43.02645 ], [ -71.476714, -43.026809 ], [ -71.475982, -43.026262 ], [ -71.476479, -43.025904 ] ] ] } },
+{ "type": "Feature", "properties": { "id": 3, "loteo": "BALCONES-RUTA 71", "nombrecompleto": "PARCELA D", "estado": "DISPONIBLE", "area": 4813.0 }, "geometry": { "type": "Polygon", "coordinates": [ [ [ -71.477305, -43.027353 ], [ -71.476815, -43.027703 ], [ -71.476034, -43.02712 ], [ -71.476452, -43.026819 ], [ -71.476716, -43.027016 ], [ -71.476786, -43.026966 ], [ -71.477305, -43.027353 ] ] ] } },
+{ "type": "Feature", "properties": { "id": 4, "loteo": "BALCONES-RUTA 71", "nombrecompleto": "PARCELA E", "estado": "DISPONIBLE", "area": 4807.0 }, "geometry": { "type": "Polygon", "coordinates": [ [ [ -71.476452, -43.026819 ], [ -71.476034, -43.02712 ], [ -71.475167, -43.026472 ], [ -71.475585, -43.026171 ], [ -71.476452, -43.026819 ] ] ] } },
+{ "type": "Feature", "properties": { "id": 5, "loteo": "BALCONES-RUTA 71", "nombrecompleto": "PARCELA C", "estado": "DISPONIBLE", "area": 4821.0 }, "geometry": { "type": "Polygon", "coordinates": [ [ [ -71.475131, -43.025626 ], [ -71.475371, -43.025709 ], [ -71.475702, -43.025324 ], [ -71.476479, -43.025904 ], [ -71.475982, -43.026262 ], [ -71.475131, -43.025626 ] ] ] } },
+{ "type": "Feature", "properties": { "id": 6, "loteo": "BALCONES-RUTA 71", "nombrecompleto": "PARCELA F ", "estado": "DISPONIBLE", "area": 4805.0 }, "geometry": { "type": "Polygon", "coordinates": [ [ [ -71.475167, -43.026472 ], [ -71.474295, -43.025821 ], [ -71.474611, -43.025587 ], [ -71.474773, -43.025565 ], [ -71.475585, -43.026171 ], [ -71.475167, -43.026472 ] ] ] } }
+]
+}

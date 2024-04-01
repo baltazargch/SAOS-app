@@ -1,0 +1,194 @@
+{% extends "base.html" %} {% block title %}Registrarse{% endblock %}
+
+{% block main_content %}
+
+<script type="text/javascript" src="{{ url_for('static', filename='js/tabla-users.js')}}"> </script>
+
+<div style="display:flex; padding-left: 2rem; padding-top: 0.5rem; width: 95vw; height: 70vh;">
+    <div style="border-right: 1px solid rgba(0,0,0,0.2); padding-right:2rem;">
+        <form action="new_user" method='POST'>
+            <fieldset class="uk-fieldset">
+                <legend class="uk-legend">Registrar un nuevo usuario</legend>
+                <div class="uk-form-controls">
+                    <label class="uk-form-label" for="form-stacked-text">Nombre(s)</label>
+                    <input type="text" class="uk-input uk-form-small" name="nombre" placeholder="Ingrese nombre(s)">
+                </div>
+
+                <div class="uk-form-controls">
+                    <label class="uk-form-label" for="form-stacked-text">Apellido(s)</label>
+                    <input type="text" class="uk-input uk-form-small" name="apellido" placeholder="Ingrese apellido(s)">
+                </div>
+
+                <div class="uk-form-controls">
+                    <label class="uk-form-label" for="form-stacked-text">Email</label>
+                    <input type="email" class="uk-input uk-form-small" name="email"
+                        placeholder="Ingrese correo electrónico">
+                </div>
+                <br>
+
+                <div class="uk-form-controls">
+                    <div class="uk-margin uk-grid-small uk-child-width-auto uk-grid">
+                        <label class="uk-form-label" for="form-stacked-text">Rol</label>
+                        <label><input class="uk-radio" type="radio" name="rol" value="admin" checked>
+                            Administrador
+                        </label>
+                        <label><input class="uk-radio" type="radio" name="rol" value="user"> Usuario
+                        </label>
+                    </div>
+
+                </div>
+
+                <div class="uk-form-controls">
+                    <label class="uk-form-label" for="form-stacked-text">Contraseña</label>
+                    <input type="password" class="uk-input uk-form-small" name="password1"
+                        placeholder="Ingrese contraseña segura">
+                </div>
+
+                <div class="uk-form-controls">
+                    <label class="uk-form-label" for="form-stacked-text">Confirmar contraseña</label>
+                    <input type="password" class="uk-input uk-form-small" name="password2"
+                        placeholder="Repita contraseña segura">
+                </div>
+                <br />
+            </fieldset>
+            <button type="submit" class="uk-button uk-button-secondary .uk-width-1-1">Agregar usuario
+            </button>
+        </form>
+    </div>
+    <div>
+        <ul uk-tab style="padding-left: 2rem;">
+            <li id='irusuarios' class="uk-active"><a href="#usuarios">Usuarios</a></li>
+            <li id='irpermisos'><a href="#permisos">Permisos</a></li>
+        </ul>
+        <ul class="uk-switcher uk-margin">
+            <li id="tabusuarios">
+                <div id='usuarios'
+                    style="display:flex; padding-left: 2rem; padding-top: 0.5rem; width: 60vw; height: 70vh;">
+                    <div class="uk-overflow-auto" style="padding-left: 1.5rem; justify-content:center;">
+                        <table id="tabla-users" class="uk-table uk-table-small uk-table-divider">
+                            <thead>
+                                <tr>
+                                    <th>Nombre(s)</th>
+                                    <th>Apellido(s)</th>
+                                    <th>Email</th>
+                                    <th>Roles</th>
+                                    <th>Fecha</th>
+                                    <th>Acción</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {%for usuario in tablaUsers%}
+                                <tr>
+                                    <td>{{usuario.nombre}}</td>
+                                    <td>{{usuario.apellido}}</td>
+                                    <td>{{usuario.email}}</td>
+                                    <td>{{usuario.tipo}}</td>
+                                    <td>{{usuario.date}}</td>
+                                    <td>
+                                        <div style="display:flex; justify-content: center;">
+                                            <a href="/edit_user/{{ usuario.id }}">
+                                                <button class="uk-button-small uk-button-default"
+                                                    type="submit">Editar</button>
+                                            </a>
+                                            <a href="/delete_user/{{ usuario.id }}">
+                                                <button class="uk-button-small uk-button-danger deleteUser"
+                                                    type="submit">Elimnar</button>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {%endfor%}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </li>
+            <li id="tabpermisos">
+                <div id="permisos"
+                    style="display:flex; padding-left: 2rem; padding-top: 0.5rem; width: 60vw; height: 70vh; justify-content:center;">
+                    <div class="uk-overflow-auto" style="padding-left: 2.5rem; justify-content:center;">
+                        <p class="uk-text-warning">Para modificar los permisos, hagalo usuario a usuario.</p>
+                        <table id="tabla-permits" class="uk-table uk-table-small uk-table-divider">
+                            <thead>
+                                <tr>
+                                    <th>Nombre</th>
+                                    <th>Mapas</th>
+                                    <th>Loteos</th>
+                                    <th>Construcción</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {%if permitsUser != ''%}
+                                {%for permUser in permitsUser%}
+                                <tr>
+                                    <form action="edit_permits" method="POST">
+                                        <td> {{ permUser.user.nombre }} </td>
+                                        <td style="text-align: center;">
+                                            <input name='mapsPermit{{permUser.id}}' class="uk-checkbox" type="checkbox"
+                                                {%if permUser.mapas=='Si' %} checked{% endif %} value="Si"></>
+                                        </td>
+                                        <td style="text-align: center;">
+                                            <input name='lotsPermit{{permUser.id}}' class="uk-checkbox" type="checkbox"
+                                                {%if permUser.loteos=='Si' %} checked{% endif %} value="Si"></>
+                                        </td>
+                                        <td style="text-align: center;">
+                                            <input name='consPermit{{permUser.id}}' class="uk-checkbox" type="checkbox"
+                                                {%if permUser.construccion=='Si' %} checked{% endif %} value="Si"></>
+                                        </td>
+                                        <td>
+                                            <div style="display:flex; justify-content: center;">
+                                                <button name="btnId" class="uk-button-small uk-button-default"
+                                                    type="submit" value="{{ permUser.id }}">Guardar</button>
+                                            </div>
+                                        </td>
+                                    </form>
+                                </tr>
+                                {%endfor%}
+                                {%endif%}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </li>
+        </ul>
+    </div>
+</div>
+<script>
+    const btnDelete = document.querySelectorAll('.deleteUser');
+
+    if (btnDelete) {
+        arrayDelete = Array.from(btnDelete);
+        arrayDelete.forEach((btn) => {
+            btn.addEventListener('click', (e) => {
+                if (!confirm('¿Estás seguro de que quieres eliminar este usuario?')) {
+                    e.preventDefault();
+                }
+            });
+        });
+    };
+
+    document.addEventListener('DOMContentLoaded', function () {
+        // Obtener el parámetro 'tab' de la URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const tabParam = urlParams.get('tab');
+
+        // Verificar si el parámetro 'tab' es igual a 'permisos'
+        if (tabParam === 'permisos') {
+            // Obtener el elemento del switcher correspondiente al tab de permisos
+            const liSelc = document.getElementById('irpermisos');
+            const tabSelc = document.getElementById('tabpermisos');
+
+            const liNoSelec = document.getElementById('irusuarios');
+            const tabNoSelc = document.getElementById('tabusuarios');
+
+            liNoSelec.classList.remove('uk-active');
+            tabNoSelc.classList.remove('uk-active');
+
+            liSelc.classList.add('uk-active');
+            tabSelc.classList.add('uk-active');
+
+        }
+    });
+</script>
+{% endblock %}

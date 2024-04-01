@@ -1,0 +1,75 @@
+{% extends "base.html" %} {% block title %}Bienvenido a SAOS{% endblock %}
+
+{% block main_content %}
+<div class="dash__div" style="padding: 0.5rem 5em;">
+    <h1 class="uk-heading-bullet uk-font-default">
+        <span class="uk-text-background" style="font-size: smaller;">{{ current_user.nombre.upper() }}: Portal de
+            descargas.</span>
+    </h1>
+    <div class="uk-text-background uk-text-default">
+        Su rol actual es {{ current_user.tipo.upper() }}: A continuación, encontrarás las descargas disponbiles.
+    </div>
+    <hr>
+    <br>
+    <div>
+        <div class="uk-child-width-1-1@s uk-child-width-1-3@m uk-text-center admin__dash" uk-grid="masonry: pack"
+            style="font-size: smaller;">
+            <div>
+                <a href="#" , id="donwload__data">
+                    <div class="uk-card uk-card-hover">
+                        <div class="uk-card-media-top"
+                            style="display: flex; justify-content: center ;align-items: center;">
+                            <ion-icon name="file-tray-full-outline" class="ion-icon-xl"></ion-icon>
+                        </div>
+                        <div class="uk-card-body">
+                            <h2 class="uk-card-title">Base de datos</h2>
+                            <p>Descarga la información de pagos (.csv)</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            <div>
+                <a href="#">
+                    <div class="uk-card uk-card-hover">
+                        <div class="uk-card-media-top"
+                            style="display: flex; justify-content: center ;align-items: center;">
+                            <ion-icon name="map-outline" class="ion-icon-xl"></ion-icon>
+                        </div>
+                        <div class="uk-card-body">
+                            <h3 class="uk-card-title">Mapas</h3>
+                            <p>Descarga la información de loteos (.csv)</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            <div>
+                <a href="#">
+                    <div class="uk-card uk-card-hover">
+                        <div class="uk-card-media-top"
+                            style="display: flex; justify-content: center ;align-items: center;">
+                            <ion-icon name="home-outline" class="ion-icon-xl"></ion-icon>
+                        </div>
+                        <div class="uk-card-body">
+                            <h3 class="uk-card-title">Construcción</h3>
+                            <p>Descarga la información de construcción (.csv)</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+    <script>
+        document.getElementById('donwload__data').addEventListener('click', function (event) {
+            event.preventDefault(); // Evita el comportamiento predeterminado de navegación
+
+            // Crea un formulario y agrega un campo de entrada
+            var form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '/descargar_csv'; // La URL a la que se enviará la solicitud POST
+
+            // Agrega el formulario al cuerpo del documento y envíalo
+            document.body.appendChild(form);
+            form.submit();
+        });
+    </script>
+    {%endblock%}

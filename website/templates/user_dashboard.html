@@ -1,0 +1,63 @@
+{% extends "base.html" %} {% block title %}Bienvenido a SAOS{% endblock %}
+
+{% block main_content %}
+<div class="dash__div" style="padding: 0.5rem 5em;">
+    <h1 class="uk-heading-bullet uk-font-default">
+        <span class="uk-text-background">{{ current_user.nombre.upper() }}: Bienvenid@ a tu portal SAOS:</span>
+        <hr>
+    </h1>
+    <p>A continuación, encontrarás los servicios habilitados. No dudes en conctactar al equipo SAOS para potenciar
+        tus
+        servicos.</p>
+    <br>
+    <div style="display:flex; justify-content: center;">
+        <div class="uk-child-width-1-1@s uk-child-width-1-{{ cols }}@m uk-grid-small uk-grid-match" uk-grid
+            style="{% if cols == 1 %} width: 25%; {% elif cols == 2 %} width: 50%; {% endif %}">
+            <div>
+                {% if permits.loteos == 'Si' %}
+                <a href="/user_cuotas">
+                    <div class="uk-card uk-card-hover">
+                        <div class="uk-card-media-top">
+                            <img src="static/media/finance.jpg" width="" height="" alt="">
+                        </div>
+                        <div class="uk-card-body">
+                            <h3 class="uk-card-title">Cuotas</h3>
+                            <p>Tu portal al pago de cuotas y estados de cuentas</p>
+                        </div>
+                    </div>
+                </a>
+                {%endif%}
+            </div>
+            <div>
+                {% if permits.mapas == 'Si'%}
+                <a href="/maps_users">
+                    <div class="uk-card uk-card-hover">
+                        <div class="uk-card-media-top" style="overflow: hidden;">
+                            <img src="static/media/loteos.jpg" width="" height="" alt="">
+                        </div>
+                        <div class="uk-card-body">
+                            <h3 class="uk-card-title">Loteos</h3>
+                            <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Est, consequatur?</p>
+                        </div>
+                    </div>
+                </a>
+                {%endif%}
+            </div>
+            <div>
+                {% if permits.construccion == 'Si' %}
+                <a href="#">
+                    <div class="uk-card uk-card-hover">
+                        <div class="uk-card-media-top">
+                            <img src="static/media/construction.jpg" width="" height="" alt="">
+                        </div>
+                        <div class="uk-card-body">
+                            <h3 class="uk-card-title">Construcción</h3>
+                            <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Est, consequatur?</p>
+                        </div>
+                    </div>
+                </a>
+                {%endif%}
+            </div>
+        </div>
+    </div>
+    {% endblock %}

@@ -1,0 +1,30 @@
+{% extends "base.html" %} {% block title %}Acceder{% endblock %}
+
+{% block main_content %}
+
+<div class="wrapper">
+    <video autoplay muted loop id="background-video">
+        <source src="static/media/back2.mp4" type="video/mp4">
+    </video>
+    <form method="POST">
+        <div class="form-box-singup">
+            <div class="form-value">
+                <form action="" method="POST" id="form-login">
+                    <h2>Acceder</h2>
+                    <div class="inputbox">
+
+                        <label class="uk-form-label" for="form-stacked-text">Email</label>
+                        <input type="email" id="email" name="email">
+                    </div>
+                    <div class="inputbox">
+                        <label for="">Contraseña</label>
+                        <input type="password" id="password" name="password">
+                    </div>
+                    <button type="submit">Enviar</button>
+                </form>
+            </div>
+        </div>
+    </form>
+</div>
+
+{% endblock %}

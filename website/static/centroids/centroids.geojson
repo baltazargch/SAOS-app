@@ -1,0 +1,12 @@
+{
+"type": "FeatureCollection",
+"name": "centroids",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+"features": [
+{ "type": "Feature", "properties": { "Loteo": "ALTOS DE EPUYEN" }, "geometry": { "type": "Point", "coordinates": [ -71.354580576142055, -42.224439603565777 ] } },
+{ "type": "Feature", "properties": { "Loteo": "BALCONES-RUTA 71" }, "geometry": { "type": "Point", "coordinates": [ -71.47619412777965, -43.026494065755017 ] } },
+{ "type": "Feature", "properties": { "Loteo": "BOULEVARES II" }, "geometry": { "type": "Point", "coordinates": [ -71.467325634529104, -43.06727467359427 ] } },
+{ "type": "Feature", "properties": { "Loteo": "LADERAS DEL DON BOSCO" }, "geometry": { "type": "Point", "coordinates": [ -71.309760600464983, -42.895890949372856 ] } },
+{ "type": "Feature", "properties": { "Loteo": "MIRADORES DEL CORINTO" }, "geometry": { "type": "Point", "coordinates": [ -71.450108776798444, -43.098467520429892 ] } }
+]
+}

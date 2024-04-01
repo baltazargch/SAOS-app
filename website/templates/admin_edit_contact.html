@@ -1,0 +1,51 @@
+{% extends "base.html" %} {% block title %}Editar usuario{% endblock %}
+
+{% block main_content %}
+<div id="modal-edit" uk-modal>
+    <div class="uk-modal-dialog uk-modal-body">
+        <form action="/update_user/{{ usuario.id }}" method='POST'>
+            <fieldset class="uk-fieldset">
+
+                <legend class="uk-legend">Modificar usuario</legend>
+
+                <div class="uk-form-controls">
+                    <label class="uk-form-label" for="form-stacked-text">Nombre(s)</label>
+                    <input type="text" class="uk-input" name="nombre" value="{{ usuario.nombre }}">
+                </div>
+
+                <div class="uk-form-controls">
+                    <label class="uk-form-label" for="form-stacked-text">Apellido(s)</label>
+                    <input type="text" class="uk-input" name="apellido" value="{{ usuario.apellido }}">
+                </div>
+
+                <div class="uk-form-controls">
+                    <label class="uk-form-label" for="form-stacked-text">Email</label>
+                    <input type="email" class="uk-input" name="email" value="{{ usuario.email }}">
+                </div>
+                <br>
+
+                <div class="uk-form-controls">
+                    <div class="uk-margin uk-grid-small uk-child-width-auto uk-grid">
+                        <label class="uk-form-label" for="form-stacked-text">Rol</label>
+                        <label>
+                            <input class="uk-radio" type="radio" name="rol" value="admin" {% if usuario.tipo=='admin'
+                                %}checked{% endif %}> Administrador
+                        </label>
+                        <label>
+                            <input class="uk-radio" type="radio" name="rol" value="user" {% if usuario.tipo=='user'
+                                %}checked{% endif %}> Usuario
+                        </label>
+                    </div>
+                </div>
+                <br />
+            </fieldset>
+            <button type="submit" class="uk-button uk-button-secondary .uk-width-1-1">Modificar usuario</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    UIkit.modal("#modal-edit").show();
+</script>
+
+{% endblock %}
