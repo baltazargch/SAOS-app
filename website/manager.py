@@ -26,16 +26,21 @@ def nuevo_cliente():
             
             fechaini = datetime.strptime(fechaini, '%Y-%m-%d').date() # type: ignore
         
-        crear_cuotas_usuario(
-            cliente=cliente,
-            proyecto=proyecto, 
-            lote = lote, 
-            usuario=user_to_add, 
-            num_cuotas=int(cuotas), # type: ignore
-            valor_cuota=valorcuotas, 
-            fecha_inicio=fechaini
-            )
-        
+            clienteid = "{}-{}-{}".format(cliente.replace(' ', '-'), proyecto, lote).lower() #type: ignore
+            existe = Cuotas.query.filter_by(clienteid=clienteid).first()
+            if existe: 
+                flash('El plan de pagos a crear {}, ya existe'.format(clienteid), 'error')
+            else:
+                crear_cuotas_usuario(
+                    cliente=cliente,
+                    proyecto=proyecto, 
+                    lote = lote, 
+                    usuario=user_to_add, 
+                    num_cuotas=int(cuotas), # type: ignore
+                    valor_cuota=valorcuotas, 
+                    fecha_inicio=fechaini
+                    )
+            
     return redirect('/admincuotas')
 
 @manager.route('/descargar_csv', methods=['POST'])

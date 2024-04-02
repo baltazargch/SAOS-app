@@ -35,6 +35,10 @@ def new_user_const(email, password, nombre, apellido, tipo, mapas, loteos, const
     return nuevo_usuario
 
 def crear_cuotas_usuario(cliente, proyecto, lote, usuario, num_cuotas, valor_cuota, fecha_inicio):
+    
+    # crear id único
+    clienteid = "{}-{}-{}".format(cliente.replace(' ', '-'), proyecto, lote).lower()
+    
     # Calcular la fecha de inicio para la primera cuota
     fecha_cuota = fecha_inicio
     
@@ -46,6 +50,7 @@ def crear_cuotas_usuario(cliente, proyecto, lote, usuario, num_cuotas, valor_cuo
         # Crear una nueva cuota
         nueva_cuota = Cuotas(
             cliente=cliente,
+            clienteid = clienteid,
             proyecto = proyecto,
             lote = lote, 
             numcuotas = num_cuotas,
@@ -66,7 +71,6 @@ def crear_cuotas_usuario(cliente, proyecto, lote, usuario, num_cuotas, valor_cuo
     # Confirmar los cambios en la base de datos
     db.session.commit()
     
-# Función para crear un archivo CSV a partir de los datos de la tabla Cuotas
 def generar_csv_cuotas():
     # Obtiene todos los registros de la tabla Cuotas
     cuotas = Cuotas.query.all()
@@ -109,7 +113,7 @@ def generar_csv_cuotas():
 
 def ultimas_cuotas(id):
     # Obtener una lista de clientes únicos para el usuario actual
-    clientes = db.session.query(Cuotas.cliente).filter_by(user_id=id).distinct().all()
+    clientes = db.session.query(Cuotas.clienteid).filter_by(user_id=id).distinct().all()
     
     # Lista para almacenar los resultados
     resultados = []
@@ -118,30 +122,30 @@ def ultimas_cuotas(id):
     for cliente in clientes:
         cliente = cliente[0]  # El resultado es una tupla, así que tomamos el primer elemento
         # Obtener la última cuota pagada para el cliente actual
-        ultima_cuota_pagada = Cuotas.query.filter_by(cliente=cliente, estadocuota='Pagado') \
+        ultima_cuota_pagada = Cuotas.query.filter_by(clienteid=cliente, estadocuota='Pagado') \
                                           .order_by(Cuotas.fechacuota.desc()).first()
         # Obtener la siguiente cuota a pagar para el cliente actual
-        siguiente_cuota_pagar = Cuotas.query.filter_by(cliente=cliente, estadocuota='Pendiente') \
+        siguiente_cuota_pagar = Cuotas.query.filter_by(clienteid=cliente, estadocuota='Pendiente') \
                                             .order_by(Cuotas.fechacuota).first()
                                             
         # Calcular el total de cuotas y el saldo pendiente
-        total_cuotas_cliente = Cuotas.query.filter_by(cliente=cliente).count()
+        total_cuotas_cliente = Cuotas.query.filter_by(clienteid=cliente).count()
         saldo_pendiente_cliente = db.session.query(func.sum(Cuotas.cuotadolar)) \
-                                     .filter_by(cliente=cliente, estadocuota='Pendiente').scalar()
+                                     .filter_by(clienteid=cliente, estadocuota='Pendiente').scalar()
                                               
-        totalDeuda = total_cuotas_cliente * siguiente_cuota_pagar.cuotadolar
+        totalDeuda = total_cuotas_cliente * siguiente_cuota_pagar.cuotadolar #type:ignore
                         
         labelColor=""
         estado = ""
-        if siguiente_cuota_pagar.fechacuota < datetime.now().date():
+        if siguiente_cuota_pagar.fechacuota < datetime.now().date(): #type:ignore
             labelColor = 'danger'
             estado = 'Vencido'
-        elif siguiente_cuota_pagar.fechacuota == datetime.now().date(): 
+        elif siguiente_cuota_pagar.fechacuota == datetime.now().date():  #type:ignore
             labelColor = 'warning'
             estado = 'Pronto'
         else: 
             labelColor='success'
-            estado = 'En regla'
+            estado = 'A tiempo'
 
         # Agregar los resultados a la lista
         resultados.append({

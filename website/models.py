@@ -27,6 +27,7 @@ class Cuotas(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     fecha = db.Column(db.DateTime(timezone=True), default=func.now())
     cliente = db.Column(db.String(250))
+    clienteid = db.Column(db.String(250))
     proyecto = db.Column(db.String(250))
     lote = db.Column(db.String(250))
     numcuotas = db.Column(db.Integer)

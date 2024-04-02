@@ -2,6 +2,7 @@ from flask import Blueprint, render_template
 from flask_login import login_required, current_user
 from .utils import tipo_usuario_aceptado, ultimas_cuotas
 from .models import Permit, User, Cuotas
+from . import db
 
 
 # Estas son las vistas de la app general. 
@@ -87,18 +88,30 @@ def admin_descargas():
 def user_cuotas():
     if current_user.is_authenticated:
         cuotas = Cuotas.query.filter_by(user_id = current_user.id).all()
-        
+                
         next_cuotas = ultimas_cuotas(current_user.id)
-        
+    
         if cuotas:
             for cuota in cuotas:   
                 cuota.fecha = cuota.fecha.date()
                 
             # Realiza una consulta para obtener valores únicos de la columna "cliente"
-            clientes_unicos = Cuotas.query.filter_by(user_id = current_user.id).with_entities(Cuotas.cliente).distinct().all()
-    
-            # Extrae los valores únicos de la consulta y conviértelos en una lista
-            clientes_unicos = [cliente[0] for cliente in clientes_unicos]
+            clientes_unicos = Cuotas.query.filter_by(user_id = current_user.id)\
+                .with_entities(Cuotas.cliente, Cuotas.clienteid).distinct()\
+                        .all()
+            
+            temp_dict = {}
+
+            # Iterar sobre los datos originales
+            for cliente, clienteid in clientes_unicos:
+                # Si el cliente ya está en el diccionario, agregamos el clienteid a la lista existente
+                if cliente in temp_dict:
+                    temp_dict[cliente].append(clienteid)
+                # Si el cliente no está en el diccionario, creamos una nueva lista con el clienteid
+                else:
+                    temp_dict[cliente] = [clienteid]
+
+            # Convertir el diccionario en la lista de diccionarios deseada
+            clientes_unicos = [{'cliente': cliente, 'cuentasid': tuple(ids)} for cliente, ids in temp_dict.items()]
         
-    return render_template('user_cuotas.html', user=current_user, cuotas=cuotas, 
-                           clientes=clientes_unicos, next_cuotas=next_cuotas)
+    return render_template('user_cuotas.html', user=current_user, cuotas=cuotas, clientes=clientes_unicos, next_cuotas=next_cuotas)
