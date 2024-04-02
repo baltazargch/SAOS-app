@@ -3,8 +3,9 @@ from flask import abort, Flask
 from flask_login import current_user
 from .models import User, Permit, Cuotas
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import func
 from . import db
-from datetime import timedelta
+from datetime import timedelta, datetime
 from io import StringIO
 import csv
 
@@ -105,3 +106,52 @@ def generar_csv_cuotas():
 
     # Regresamos el contenido del archivo CSV
     return output.getvalue()
+
+def ultimas_cuotas(id):
+    # Obtener una lista de clientes únicos para el usuario actual
+    clientes = db.session.query(Cuotas.cliente).filter_by(user_id=id).distinct().all()
+    
+    # Lista para almacenar los resultados
+    resultados = []
+
+    # Iterar sobre cada cliente único
+    for cliente in clientes:
+        cliente = cliente[0]  # El resultado es una tupla, así que tomamos el primer elemento
+        # Obtener la última cuota pagada para el cliente actual
+        ultima_cuota_pagada = Cuotas.query.filter_by(cliente=cliente, estadocuota='Pagado') \
+                                          .order_by(Cuotas.fechacuota.desc()).first()
+        # Obtener la siguiente cuota a pagar para el cliente actual
+        siguiente_cuota_pagar = Cuotas.query.filter_by(cliente=cliente, estadocuota='Pendiente') \
+                                            .order_by(Cuotas.fechacuota).first()
+                                            
+        # Calcular el total de cuotas y el saldo pendiente
+        total_cuotas_cliente = Cuotas.query.filter_by(cliente=cliente).count()
+        saldo_pendiente_cliente = db.session.query(func.sum(Cuotas.cuotadolar)) \
+                                     .filter_by(cliente=cliente, estadocuota='Pendiente').scalar()
+                                              
+        totalDeuda = total_cuotas_cliente * siguiente_cuota_pagar.cuotadolar
+                        
+        labelColor=""
+        estado = ""
+        if siguiente_cuota_pagar.fechacuota < datetime.now().date():
+            labelColor = 'danger'
+            estado = 'Vencido'
+        elif siguiente_cuota_pagar.fechacuota == datetime.now().date(): 
+            labelColor = 'warning'
+            estado = 'Pronto'
+        else: 
+            labelColor='success'
+            estado = 'En regla'
+
+        # Agregar los resultados a la lista
+        resultados.append({
+            'cliente': cliente,
+            'ultima_cuota_pagada': ultima_cuota_pagada,
+            'siguiente_cuota_pagar': siguiente_cuota_pagar, 
+            'saldo_pendiente_cliente': saldo_pendiente_cliente,
+            'labelColor' : labelColor, 
+            'estado':estado,
+            'totalDeuda':totalDeuda,
+        })
+
+    return resultados

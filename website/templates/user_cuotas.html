@@ -15,16 +15,63 @@
         <ul class="uk-switcher uk-margin" class="uk-width-6-6;">
             {%for cliente in clientes %}
             <li id="{{'tab'+cliente+'li'}}">
+                {% for nxct in next_cuotas if nxct.cliente == cliente %}
+                <h2> <span class="uk-text-background"> Estado de cuenta: {{
+                        nxct.cliente }}</span></h2>
+                <div class="uk-child-width-1-3@m" uk-grid>
+                    <div>
+                        <div class="uk-card uk-card-default uk-card-body">
+                            <h3 class="uk-card-title"><b><ion-icon name="id-card-outline" size="large"></ion-icon> Datos
+                                    de
+                                    cuenta:</b></h3>
+                            <div uk-grid class="uk-child-width-1-2">
+                                <div>
+                                    <p>Proyecto: {{ nxct.siguiente_cuota_pagar.proyecto }}</p>
+                                    <p>Lote: {{ nxct.siguiente_cuota_pagar.lote }}</p>
+                                    <p>Fecha inicio: {{ nxct.siguiente_cuota_pagar.fecha }}</p>
+                                </div>
+                                <div>
+                                    <p>Plan de cuotas: {{ nxct.siguiente_cuota_pagar.numcuotas }}</p>
+                                    <p>Valor cuotas: {{ nxct.siguiente_cuota_pagar.cuotadolar }}</p>
+                                    <p>Saldo parcial: {{ nxct.saldo_pendiente_cliente }}</p>
+                                </div>
+                            </div>
+                            <hr>
+                            <div
+                                style="display: flex; justify-content: center; text-align:center; align-items: center; padding-bottom: 0rem;">
+                                <h4><b>Total deuda:</b><br> {{ nxct.totalDeuda }} USD</h4>
+                            </div>
+                        </div>
+                    </div>
+                    {% if nxct.ultima_cuota_pagada %}
+                    <div>
+                        <div class="uk-card uk-card-default uk-card-body">
+                            <h3 class="uk-card-title"><b>Última cuota pagada:</b></h3>
+                            <p>Fecha: {{ nxct.ultima_cuota_pagada.fechacuota }}</p>
+                            <p>Monto: {{ nxct.ultima_cuota_pagada.cuotadolar }} USD</p>
+                            <!-- Agrega más campos según sea necesario -->
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% if nxct.siguiente_cuota_pagar %}
+                    <div>
+                        <div class="uk-card uk-card-default uk-card-body">
+                            <div class="uk-card-badge uk-label-{{nxct.labelColor}}">{{nxct.estado}}
+                            </div>
+                            <h3 class="uk-card-title"><b>Siguiente cuota a pagar:</b></h3>
+                            <p>Fecha: {{ nxct.siguiente_cuota_pagar.fechacuota }}</p>
+                            <p>Monto: {{ nxct.siguiente_cuota_pagar.cuotadolar }} USD</p>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+                <hr>
+                {% endfor %}
                 <div id="{{'tab'+cliente}}" style="padding-left: 0.5rem; width:100%;">
                     <table id="tabla-{{cliente}}" class="uk-table uk-table-small uk-table-divider tabla-cuotas-user">
                         <thead>
                             <tr>
                                 <th>Cliente</th>
-                                <th>Valor cuota</th>
-                                <th>Proyecto</th>
-                                <th>Lote</th>
-                                <th>Fecha inicio</th>
-                                <th>Cuotas totales</th>
                                 <th>Número de cuota</th>
                                 <th>Fecha a pagar</th>
                                 <th>Estado del pago</th>
@@ -34,11 +81,6 @@
                             {% for cuota in cuotas if cuota.cliente == cliente %}
                             <tr>
                                 <td>{{cuota.cliente}}</td>
-                                <td>{{cuota.cuotadolar}}</td>
-                                <td>{{cuota.proyecto}}</td>
-                                <td>{{cuota.lote}}</td>
-                                <td>{{cuota.fecha}}</td>
-                                <td>{{cuota.numcuotas}}</td>
                                 <td>{{cuota.idcuota}}</td>
                                 <td>{{cuota.fechacuota}}</td>
                                 <td>{{cuota.estadocuota}}</td>

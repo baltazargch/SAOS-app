@@ -1,7 +1,8 @@
 from flask import Blueprint, render_template
 from flask_login import login_required, current_user
-from .utils import tipo_usuario_aceptado
+from .utils import tipo_usuario_aceptado, ultimas_cuotas
 from .models import Permit, User, Cuotas
+
 
 # Estas son las vistas de la app general. 
 views = Blueprint('views', __name__)
@@ -87,11 +88,17 @@ def user_cuotas():
     if current_user.is_authenticated:
         cuotas = Cuotas.query.filter_by(user_id = current_user.id).all()
         
+        next_cuotas = ultimas_cuotas(current_user.id)
+        
         if cuotas:
+            for cuota in cuotas:   
+                cuota.fecha = cuota.fecha.date()
+                
             # Realiza una consulta para obtener valores únicos de la columna "cliente"
             clientes_unicos = Cuotas.query.filter_by(user_id = current_user.id).with_entities(Cuotas.cliente).distinct().all()
     
             # Extrae los valores únicos de la consulta y conviértelos en una lista
             clientes_unicos = [cliente[0] for cliente in clientes_unicos]
         
-    return render_template('user_cuotas.html', user=current_user, cuotas=cuotas, clientes=clientes_unicos)
+    return render_template('user_cuotas.html', user=current_user, cuotas=cuotas, 
+                           clientes=clientes_unicos, next_cuotas=next_cuotas)
