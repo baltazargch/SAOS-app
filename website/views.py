@@ -3,6 +3,8 @@ from flask_login import login_required, current_user
 from .utils import tipo_usuario_aceptado, ultimas_cuotas
 from .models import Permit, User, Cuotas
 from . import db
+from sqlalchemy import func
+from datetime import datetime
 
 
 # Estas son las vistas de la app general. 
@@ -81,6 +83,66 @@ def admincuotas():
 @tipo_usuario_aceptado('admin')
 def admin_descargas():
     return render_template('admin_descargas.html', user=current_user)
+
+@views.route('/admin_pagos', methods=['GET'])
+@login_required
+@tipo_usuario_aceptado('admin')
+def admin_pagos():
+    
+    cuotas = Cuotas.query.all()
+    usuarios = User.query.filter_by(tipo='user')
+    
+    for user in usuarios:
+        # Obtener una lista de clientes únicos para el usuario actual
+        clientes = db.session.query(Cuotas.clienteid).filter_by(user_id=user.id).distinct().all()
+        
+        # Lista para almacenar los resultados
+        resultados = []
+
+    # Iterar sobre cada cliente único
+        for cliente in clientes:
+            cliente = cliente[0]  # El resultado es una tupla, así que tomamos el primer elemento
+            # Obtener la última cuota pagada para el cliente actual
+            ultima_cuota_pagada = Cuotas.query.filter_by(clienteid=cliente, estadocuota='Pagado') \
+                                            .order_by(Cuotas.fechacuota.desc()).first()
+            # Obtener la siguiente cuota a pagar para el cliente actual
+            siguiente_cuota_pagar = Cuotas.query.filter_by(clienteid=cliente, estadocuota='Pendiente') \
+                                                .order_by(Cuotas.fechacuota).first()
+                                                
+            # Calcular el total de cuotas y el saldo pendiente
+            total_cuotas_cliente = Cuotas.query.filter_by(clienteid=cliente).count()
+            saldo_pendiente_cliente = db.session.query(func.sum(Cuotas.cuotadolar)) \
+                                        .filter_by(clienteid=cliente, estadocuota='Pendiente').scalar()
+                                                
+            totalDeuda = total_cuotas_cliente * siguiente_cuota_pagar.cuotadolar #type:ignore
+                            
+            labelColor=""
+            estado = ""
+            if siguiente_cuota_pagar.fechacuota < datetime.now().date(): #type:ignore
+                labelColor = 'danger'
+                estado = 'Vencido'
+            elif siguiente_cuota_pagar.fechacuota == datetime.now().date():  #type:ignore
+                labelColor = 'warning'
+                estado = 'Pronto'
+            else: 
+                labelColor='success'
+                estado = 'A tiempo'
+
+            # Agregar los resultados a la lista
+            resultados.append({
+                'user': user.nombre + ' ' + user.apellido,
+                'cliente': cliente,
+                'ultima_cuota_pagada': ultima_cuota_pagada,
+                'siguiente_cuota_pagar': siguiente_cuota_pagar, 
+                'saldo_pendiente_cliente': saldo_pendiente_cliente,
+                'labelColor' : labelColor, 
+                'estado':estado,
+                'totalDeuda':totalDeuda,
+            })
+    print(resultados)
+                                            
+    return render_template('admin_pagos.html', user=current_user, cuotas=cuotas, usuarios=usuarios, 
+                           ultima=resultados)
 
 @views.route('/user_cuotas', methods=['GET'])
 @login_required

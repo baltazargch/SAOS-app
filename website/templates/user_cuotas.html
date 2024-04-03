@@ -61,6 +61,9 @@
                             {% if nxct.ultima_cuota_pagada %}
                             <div>
                                 <div class="uk-card uk-card-default uk-card-body">
+                                    <div class="uk-card-badge uk-label-success">{{ nxct.ultima_cuota_pagada.estadocuota
+                                        }}
+                                    </div>
                                     <h3 class="uk-card-title"><b>Última cuota pagada:</b></h3>
                                     <p>Fecha: {{ nxct.ultima_cuota_pagada.fechacuota }}</p>
                                     <p>Monto: {{ nxct.ultima_cuota_pagada.cuotadolar }} USD</p>

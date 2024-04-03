@@ -1,0 +1,103 @@
+{% extends "base.html" %} {% block title %}Cuotas SAOS{% endblock %}
+
+{% block main_content %}
+<div style="width:100vw; padding-left:2rem; height:100vh;">
+    <div uk-grid class="uk-child-width-expand">
+        <div class="uk-width-1-6">
+            <ul class="uk-tab-left" uk-tab="connect: #component-tab-left; animation: uk-animation-fade"
+                style="padding-left: 1rem;" uk-tab>
+                {%for us in usuarios %}
+                {%for ult in ultima %}
+                {%if ult.user == us.nombre + ' ' + us.apellido %}
+                <li class="uk-active uk-width-auto">
+                    <a href="#">
+                        <div>
+                            {{ us.nombre + ' ' + us.apellido }}
+                            <p style="color:gray; font-size:10px;">
+                                {{ ult.cliente }}</p>
+                        </div>
+                    </a>
+                </li>
+                {%endif%}
+                {%endfor%}
+                {%endfor%}
+            </ul>
+        </div>
+        <div class="uk-width-5-6 admin__pagos" style="padding-left:2rem; padding-right:2rem; height:100vh;">
+            <ul id="component-tab-left" class="uk-switcher">
+                {%for us in usuarios %}
+                {%for ult in ultima %}
+                {%if ult.user == us.nombre + ' ' + us.apellido %}
+                <li style="padding-top: 2rem;">
+                    <div class="uk-child-width-1-2@m" uk-grid="masonry: pack">
+                        <div>
+                            <div class="uk-card uk-card-default uk-card-body">
+                                <h3 class="uk-card-title"><b><ion-icon name="id-card-outline" size="large"></ion-icon>
+                                        Datos
+                                        de cuenta:</b></h3>
+                                <div uk-grid class="uk-child-width-1-3">
+                                    <div>
+                                        <p>Proyecto: {{ ult.siguiente_cuota_pagar.proyecto }}</p>
+                                        <p>Lote: {{ ult.siguiente_cuota_pagar.lote }}</p>
+                                    </div>
+                                    <div>
+                                        <p>Fecha inicio: {{ ult.siguiente_cuota_pagar.fecha }}</p>
+                                        <p>Plan de cuotas: {{ ult.siguiente_cuota_pagar.numcuotas }}</p>
+                                    </div>
+                                    <div>
+                                        <p>Valor cuotas: {{ ult.siguiente_cuota_pagar.cuotadolar }}</p>
+                                        <p>Saldo parcial: {{ ult.saldo_pendiente_cliente }}</p>
+                                    </div>
+                                </div>
+                                <hr>
+                                <div
+                                    style="display: flex; justify-content: center; text-align:center; align-items: center; padding-bottom: 0rem;">
+                                    <h4><b>Total deuda:</b><br> {{ ult.totalDeuda }} USD</h4>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            {% if ult.ultima_cuota_pagada %}
+                            <div>
+                                <div class="uk-card uk-card-default uk-card-body">
+                                    <div class="uk-card-badge uk-label-sucess">{{ ult.ultima_cuota_pagada.estadocuota }}
+                                    </div>
+                                    <h3 class="uk-card-title"><b>Última cuota pagada:</b></h3>
+                                    <p>Fecha: {{ ult.ultima_cuota_pagada.fechacuota }}</p>
+                                    <p>Monto: {{ ult.ultima_cuota_pagada.cuotadolar }} USD</p>
+                                </div>
+                            </div>
+                            {% endif %}
+                            <hr>
+                            {% if ult.siguiente_cuota_pagar %}
+                            <div>
+                                <div class="uk-card uk-card-default uk-card-body">
+                                    <div class="uk-card-badge uk-label-{{ult.labelColor}}">{{ult.estado}}
+                                    </div>
+                                    <h3 class="uk-card-title"><b>Siguiente cuota a pagar:</b></h3>
+                                    <p>Fecha: {{ ult.siguiente_cuota_pagar.fechacuota }}</p>
+                                    <p>Monto: {{ ult.siguiente_cuota_pagar.cuotadolar }} USD</p>
+                                    <div style="display: flex; justify-content:center;">
+
+                                        <form
+                                            action="/registrar_pago/{{ult.siguiente_cuota_pagar.clienteid}}/{{ult.siguiente_cuota_pagar.idcuota}}"
+                                            method="POST">
+                                            <button class="uk-button uk-button-primary uk-button-large" type="submit">
+                                                Registrar pago
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </li>
+                {%endif%}
+                {%endfor%}
+                {%endfor%}
+            </ul>
+        </div>
+    </div>
+</div>
+{%endblock%}

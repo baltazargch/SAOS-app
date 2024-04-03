@@ -350,3 +350,12 @@ p {
 .admin__dash .ion-icon-xl {
   padding-top: 1.5rem;
 }
+
+.admin__pagos {
+  background: linear-gradient(
+    to right,
+    rgba(4, 79, 37, 0.3),
+    rgba(80, 119, 86, 0.3),
+    rgba(18, 194, 233, 0.3)
+  );
+}
