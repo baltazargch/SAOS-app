@@ -92,12 +92,12 @@ def admin_pagos():
     cuotas = Cuotas.query.all()
     usuarios = User.query.filter_by(tipo='user')
     
+    resultados = []
     for user in usuarios:
         # Obtener una lista de clientes únicos para el usuario actual
         clientes = db.session.query(Cuotas.clienteid).filter_by(user_id=user.id).distinct().all()
         
         # Lista para almacenar los resultados
-        resultados = []
 
     # Iterar sobre cada cliente único
         for cliente in clientes:
@@ -139,7 +139,6 @@ def admin_pagos():
                 'estado':estado,
                 'totalDeuda':totalDeuda,
             })
-    print(resultados)
                                             
     return render_template('admin_pagos.html', user=current_user, cuotas=cuotas, usuarios=usuarios, 
                            ultima=resultados)

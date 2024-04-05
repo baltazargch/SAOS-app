@@ -1,8 +1,20 @@
-@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@500&display=swap");
+/* @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@500&display=swap"); */
+@font-face {
+  font-family: "Sora";
+  src: url("Sora-Regular.eot");
+  src: url("Sora-Regular.eot?#iefix") format("embedded-opentype"),
+    url("Sora-Regular.woff2") format("woff2"),
+    url("Sora-Regular.woff") format("woff"),
+    url("Sora-Regular.svg#Sora-Regular") format("svg");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
 * {
   margin: 0;
   padding: 0;
-  font-family: "poppins", sans-serif;
+  font-family: "Sora", sans-serif;
 }
 
 .container-all {
@@ -358,4 +370,25 @@ p {
     rgba(80, 119, 86, 0.3),
     rgba(18, 194, 233, 0.3)
   );
+}
+
+.hexagon-container {
+  width: 270px; /* Ancho del contenedor */
+  height: 250px; /* Alto del contenedor */
+  position: relative;
+  clip-path: polygon(
+    25% 0%,
+    75% 0%,
+    100% 50%,
+    75% 100%,
+    25% 100%,
+    0% 50%,
+    25% 0%
+  ); /* Forma hexagonal */
+}
+
+.hexagon-container img {
+  width: auto; /* Ajustar la imagen al tamaño del contenedor */
+  height: 100%;
+  /* display: block; */
 }

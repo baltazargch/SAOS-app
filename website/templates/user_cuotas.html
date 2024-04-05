@@ -92,9 +92,10 @@
                             <thead>
                                 <tr>
                                     <th>Cliente</th>
-                                    <th>Número de cuota</th>
+                                    <th>Cuota</th>
                                     <th>Fecha a pagar</th>
                                     <th>Estado del pago</th>
+                                    <th>Monto pagado</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -104,6 +105,12 @@
                                     <td>{{cuota.idcuota}}</td>
                                     <td>{{cuota.fechacuota}}</td>
                                     <td>{{cuota.estadocuota}}</td>
+                                    {%if cuota.cuotapagadadolar%}
+                                    <td>{{cuota.cuotapagadadolar}}</td>
+                                    {%else%}
+                                    <td></td>
+                                    {%endif%}
+
                                 </tr>
                                 {%endfor%}
                             </tbody>

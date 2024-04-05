@@ -1,11 +1,10 @@
 {% extends "base.html" %} {% block title %}Cuotas SAOS{% endblock %}
 
 {% block main_content %}
-<div style="width:100vw; padding-left:2rem; height:100vh;">
+<div style="width:99%; padding-left:1rem; height:100vh;">
     <div uk-grid class="uk-child-width-expand">
         <div class="uk-width-1-6">
-            <ul class="uk-tab-left" uk-tab="connect: #component-tab-left; animation: uk-animation-fade"
-                style="padding-left: 1rem;" uk-tab>
+            <ul class="uk-tab-left" uk-tab="connect: #component-tab-left; animation: uk-animation-fade" uk-tab>
                 {%for us in usuarios %}
                 {%for ult in ultima %}
                 {%if ult.user == us.nombre + ' ' + us.apellido %}
@@ -23,8 +22,8 @@
                 {%endfor%}
             </ul>
         </div>
-        <div class="uk-width-5-6 admin__pagos" style="padding-left:2rem; padding-right:2rem; height:100vh;">
-            <ul id="component-tab-left" class="uk-switcher">
+        <div class="uk-width-5-6 admin__pagos" style="padding-left:2rem; padding-right:0rem; height:100vh;">
+            <ul id="component-tab-left" class="uk-switcher" style="width:95%;">
                 {%for us in usuarios %}
                 {%for ult in ultima %}
                 {%if ult.user == us.nombre + ' ' + us.apellido %}
@@ -78,7 +77,6 @@
                                     <p>Fecha: {{ ult.siguiente_cuota_pagar.fechacuota }}</p>
                                     <p>Monto: {{ ult.siguiente_cuota_pagar.cuotadolar }} USD</p>
                                     <div style="display: flex; justify-content:center;">
-
                                         <form
                                             action="/registrar_pago/{{ult.siguiente_cuota_pagar.clienteid}}/{{ult.siguiente_cuota_pagar.idcuota}}"
                                             method="POST">
