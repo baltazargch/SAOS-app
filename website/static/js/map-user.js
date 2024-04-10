@@ -1,3 +1,27 @@
+// List of filenames
+var fileNames;
+/*  = [
+  "ALTOS DE EPUYEN.geojson",
+  "BALCONES-RUTA 71.geojson",
+  "BOULEVARES II.geojson",
+  "LADERAS DEL DON BOSCO.geojson",
+  "MIRADORES DEL CORINTO.geojson",
+]; */
+
+document.addEventListener("DOMContentLoaded", function () {
+  // Obtener el valor del atributo de datos
+  fileNames = document
+    .getElementById("data")
+    .dataset.archivos.replace(/['\[\]]/g, "")
+    .split(",")
+    .map(function (nombreArchivo) {
+      return nombreArchivo.trim();
+    });
+  console.log(fileNames);
+});
+
+console.log(fileNames);
+
 var geojsonData = { data: null };
 
 // Function to fetch a GEOJSON file
@@ -80,15 +104,6 @@ function irLoteo(lugar) {
     duration: 2,
   });
 }
-
-// List of filenames
-const fileNames = [
-  "ALTOS DE EPUYEN.geojson",
-  "BALCONES-RUTA 71.geojson",
-  "BOULEVARES II.geojson",
-  "LADERAS DEL DON BOSCO.geojson",
-  "MIRADORES DEL CORINTO.geojson",
-];
 
 // Function to fetch and add GEOJSON files to the Leaflet map
 async function fetchAndAddGeojsonToMap() {
@@ -237,18 +252,19 @@ function setDateToday() {
   document.getElementById("fechareserva").value = formattedDate;
 }
 
-window.onload = function() {
+window.onload = function () {
   var urlParams = new URLSearchParams(window.location.search);
   var loteo = urlParams.get("loteo");
   var clickloteo = urlParams.get("clickloteo");
   // Verificar si se debe realizar la acción
   if (clickloteo === "True") {
-
-    UIkit.notification({message: "<span uk-icon='icon: check'></span> Datos guardados correctamente.", status: 'success', timeout: 1200});
+    UIkit.notification({
+      message:
+        "<span uk-icon='icon: check'></span> Datos guardados correctamente.",
+      status: "success",
+      timeout: 1200,
+    });
     // Hacer clic en el botón automáticamente
     document.getElementById(loteo).click();
-
-
   }
 };
-  

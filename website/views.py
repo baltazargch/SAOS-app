@@ -6,6 +6,10 @@ from . import db
 from sqlalchemy import func
 from datetime import datetime
 import plotly.graph_objs as go
+import os
+import geojson
+import json
+from shapely import geometry, from_geojson
 
 # Estas son las vistas de la app general. 
 views = Blueprint('views', __name__)
@@ -24,7 +28,28 @@ def maps_no_user():
 @views.route('/maps_users',  methods=['GET', 'POST'])
 @login_required
 def maps_users():
-    return render_template("maps_users.html", user=current_user)
+    mapdir = os.path.join(os.path.dirname(__file__), 'static', 'maps')
+    files = os.listdir(mapdir)
+    
+    centroides = []
+    estados = []
+    for archivo in files:
+        with open(f'{mapdir}\\{archivo}') as f:
+            data = geojson.load(f)
+            geometria = from_geojson(geojson.dumps(data)) 
+            centroides.append({"name": archivo, "coords": geometria.centroid.coords[:][0]})
+            feat = data['features'][:]
+            feat = json.loads(json.dumps(feat))
+            
+            estados.append({
+                'name': archivo, 
+                'disponibles':sum(1 for fe in feat if fe['properties']['estado'] == 'DISPONIBLE'), 
+                'reservados':  sum(1 for fe in feat if fe['properties']['estado'] == 'RESERVADO'), 
+                'vendidos':  sum(1 for fe in feat if fe['properties']['estado'] == 'VENDIDO'), 
+                'total': sum(1 for fe in feat)
+            })
+            
+    return render_template("map_users.html", user=current_user, files=files, centroides=centroides, estados=estados)
 
 @views.route('/dashboard')
 @login_required

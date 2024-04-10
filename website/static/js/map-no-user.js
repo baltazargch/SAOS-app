@@ -87,7 +87,7 @@ const fileNames = [
   "BOULEVARES II.geojson",
   "LADERAS DEL DON BOSCO.geojson",
   "MIRADORES DEL CORINTO.geojson",
-]; 
+];
 
 // Function to fetch and add GEOJSON files to the Leaflet map
 async function fetchAndAddGeojsonToMap() {
@@ -171,14 +171,12 @@ function addGeojsonToMap(geojsonData) {
       );
     },
   }).addTo(mapLot);
-};
+}
 
 // Usage: Call fetchAndAddGeojsonToMap
 fetchAndAddGeojsonToMap();
 
 function openPage(url) {
   // Open the URL in a new window
-  window.open(url, '_blank');
-}; 
-
-
+  window.open(url, "_blank");
+}

@@ -254,15 +254,9 @@ input:valid ~ label {
   border-bottom: 2px solid #387c6c;
 }
 
-#mapLot {
-  width: 80%;
-  height: 100%;
-}
-
 .lista-loteos ul.items-loteos {
   list-style-type: none;
-  width: 90%;
-  padding-left: 1em;
+  width: 100%;
 }
 
 .lista-loteos a {

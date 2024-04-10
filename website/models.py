@@ -20,6 +20,7 @@ class Permit(db.Model):
     mapas = db.Column(db.String(250))
     loteos = db.Column(db.String(250))
     construccion = db.Column(db.String(250))
+    mappermits = db.Column(db.JSON) 
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     user = db.relationship('User', back_populates='permits')
     
