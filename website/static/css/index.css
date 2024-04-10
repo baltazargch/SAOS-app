@@ -392,3 +392,7 @@ p {
   height: 100%;
   /* display: block; */
 }
+
+.cliente__deuda .uk-badge {
+  background-color: rgb(165, 28, 28); /* Cambia el color de fondo del badge */
+}

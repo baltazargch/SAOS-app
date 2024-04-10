@@ -1,11 +1,11 @@
-from flask import Blueprint, render_template
+from flask import Blueprint, render_template, make_response, request, redirect
 from flask_login import login_required, current_user
 from .utils import tipo_usuario_aceptado, ultimas_cuotas
 from .models import Permit, User, Cuotas
 from . import db
 from sqlalchemy import func
 from datetime import datetime
-
+import plotly.graph_objs as go
 
 # Estas son las vistas de la app general. 
 views = Blueprint('views', __name__)
@@ -111,11 +111,12 @@ def admin_pagos():
                                                 
             # Calcular el total de cuotas y el saldo pendiente
             total_cuotas_cliente = Cuotas.query.filter_by(clienteid=cliente).count()
-            saldo_pendiente_cliente = db.session.query(func.sum(Cuotas.cuotadolar)) \
-                                        .filter_by(clienteid=cliente, estadocuota='Pendiente').scalar()
+            saldo_abonado = db.session.query(func.sum(Cuotas.cuotapagadadolar)) \
+                                        .filter_by(clienteid=cliente, estadocuota='Pagado').scalar()
                                                 
             totalDeuda = total_cuotas_cliente * siguiente_cuota_pagar.cuotadolar #type:ignore
-                            
+            saldo_pendiente_cliente  = totalDeuda - saldo_abonado   
+               
             labelColor=""
             estado = ""
             if siguiente_cuota_pagar.fechacuota < datetime.now().date(): #type:ignore
@@ -135,6 +136,7 @@ def admin_pagos():
                 'ultima_cuota_pagada': ultima_cuota_pagada,
                 'siguiente_cuota_pagar': siguiente_cuota_pagar, 
                 'saldo_pendiente_cliente': saldo_pendiente_cliente,
+                'saldo_abonado': saldo_abonado,
                 'labelColor' : labelColor, 
                 'estado':estado,
                 'totalDeuda':totalDeuda,
@@ -176,3 +178,69 @@ def user_cuotas():
             clientes_unicos = [{'cliente': cliente, 'cuentasid': tuple(ids)} for cliente, ids in temp_dict.items()]
         
     return render_template('user_cuotas.html', user=current_user, cuotas=cuotas, clientes=clientes_unicos, next_cuotas=next_cuotas)
+
+@views.route('/imprimir_cobranzas/<id>', methods=['GET'])
+@login_required
+def print_cobranzas(id):
+    cuotas_cliente = Cuotas.query.filter_by(clienteid=id).all()
+    icliente =  Cuotas.query.filter_by(clienteid=id).first()
+    if icliente:
+        cliente = icliente.cliente
+        idcliente = icliente.clienteid
+    # Contar las cuotas pagadas y pendientes
+    cuotas_pagadas = sum(1 for cuota in cuotas_cliente if cuota.estadocuota == 'Pagado')
+    cuotas_pendientes = sum(1 for cuota in cuotas_cliente if cuota.estadocuota == 'Pendiente')
+
+    # Crear los datos de la gráfica
+    labels = ['Pagadas', 'Pendientes']
+    valores = [cuotas_pagadas, cuotas_pendientes]
+
+   # Crea el gráfico circular utilizando Plotly
+    fig = go.Figure(data=[go.Pie(labels=labels, values=valores)])
+    grafica = fig.to_html(full_html=False)
+    
+    # Lista para almacenar los resultados
+    resultados = []
+    ultima_cuota_pagada = Cuotas.query.filter_by(clienteid=idcliente, estadocuota='Pagado') \
+                                            .order_by(Cuotas.fechacuota.desc()).first()
+            # Obtener la siguiente cuota a pagar para el cliente actual
+    siguiente_cuota_pagar = Cuotas.query.filter_by(clienteid=idcliente, estadocuota='Pendiente') \
+                                                .order_by(Cuotas.fechacuota).first()
+    
+    cuota_posterior = Cuotas.query.filter(
+        Cuotas.clienteid == idcliente,
+        Cuotas.estadocuota == 'Pendiente',
+        Cuotas.fechacuota > siguiente_cuota_pagar.fechacuota).order_by(Cuotas.fechacuota).first()    #type: ignore 
+                                    
+            # Calcular el total de cuotas y el saldo pendiente
+    total_cuotas_cliente = Cuotas.query.filter_by(clienteid=idcliente).count()
+    saldo_abonado = db.session.query(func.sum(Cuotas.cuotapagadadolar)) \
+                                        .filter_by(clienteid=idcliente, estadocuota='Pagado')\
+                                            .scalar()
+                                                
+    totalDeuda = total_cuotas_cliente * siguiente_cuota_pagar.cuotadolar #type:ignore
+    saldo_pendiente_cliente  = totalDeuda - saldo_abonado   
+    
+    fechas_cuotas = [cuota.fechacuota for cuota in cuotas_cliente]
+
+    # Calcula la fecha máxima y mínima
+    fecha_maxima = max(fechas_cuotas)
+    fecha_minima = min(fechas_cuotas)
+
+    # Agregar los resultados a la lista
+    resultados.append({
+                'cliente': cliente,
+                'ultima_cuota_pagada': ultima_cuota_pagada,
+                'siguiente_cuota_pagar': siguiente_cuota_pagar, 
+                'saldo_pendiente_cliente': saldo_pendiente_cliente,
+                'cuota_posterior':cuota_posterior,
+                'saldo_abonado': saldo_abonado,
+                'totalDeuda':totalDeuda,
+                'fecha_maxima': fecha_maxima,
+                'fecha_minima': fecha_minima
+            })
+    today = datetime.now().date()
+    
+    
+    return render_template('imprimir_cobranza.html', cliente=cuotas_cliente, grafica=grafica, 
+                           dataCliente = resultados, today=today, icliente=icliente)

@@ -58,11 +58,12 @@ def descargar_csv_cuotas():
 @manager.route('/registrar_pago/<clienteid>/<cuota>', methods=['POST']) #type: ignore
 def registrar_pago(clienteid, cuota):
     if request.method == 'POST':
+        pagado = request.form.get('pagodolares')
         cuota = Cuotas.query.filter_by(clienteid = clienteid, idcuota = cuota).first()
         
         cuota.estadocuota = 'Pagado'
         cuota.fechapago = datetime.now().date()
-        cuota.cuotapagadadolar = cuota.cuotadolar
+        cuota.cuotapagadadolar = pagado
         
         db.session.commit()
         return redirect('/admin_pagos')
