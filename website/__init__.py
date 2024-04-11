@@ -1,6 +1,6 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
-from os import path
+from os import path, environ
 from flask_login import login_manager, LoginManager
 from werkzeug.security import generate_password_hash
 
@@ -9,7 +9,7 @@ DB_NAME = 'database.db'
 
 def create_app():
     app = Flask(__name__)
-    app.config['SECRET_KEY'] = 'apoiqweasdh777asdj__%&'
+    app.config['SECRET_KEY'] = environ['SECRET_KEY']
     # Databse inside app  
     app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{DB_NAME}'
     
