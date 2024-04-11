@@ -3,7 +3,7 @@
 {% block main_content %}
 <div id="modal-edit" uk-modal>
     <div class="uk-modal-dialog uk-modal-body">
-        <form action="/update_user/{{ usuario.id }}" method='POST'>
+        <form id="form-editar-usuario" action="/update_user/{{ usuario.id }}" method='POST'>
             <fieldset class="uk-fieldset">
 
                 <legend class="uk-legend">Modificar usuario</legend>

@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, flash, redirect, url_for
+from flask import Blueprint, render_template, request, flash, redirect, url_for, jsonify
 from .models import User, Permit
 from . import db
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -39,7 +39,7 @@ def logout():
     logout_user()
     return redirect(url_for('auth.login'))
 
-@auth.route('/sing_up')
+@auth.route('/sing_up', methods=['GET', 'POST'])
 @tipo_usuario_aceptado('admin')
 def sign_up():
     tablaUsers = User.query.all()
@@ -47,8 +47,16 @@ def sign_up():
     areUser = User.query.filter_by(tipo='user').all()
     if areUser:
         permitsUser = Permit.query.all()
+        mappermits = {}
+        for user in permitsUser:
+            mappermits_str = user.mappermits
+            if mappermits_str:
+                mappermits[user.id] = json.loads(mappermits_str)
+            else:
+                mappermits[user.id] = []
     else:
         permitsUser = ''
+        mappermits = {}
         
     for user in tablaUsers:
         user.date = user.fecha.date() 
@@ -56,14 +64,8 @@ def sign_up():
     mapdir = os.path.join(os.path.dirname(__file__), 'static', 'maps')
     files = os.listdir(mapdir)
     
-    centroides = []
-    estados = []
-    for archivo in files:
-        with open(f'{mapdir}\\{archivo}') as f:
-            data = json.load(f)
-    
     return render_template('admin_permits.html', user=current_user, tablaUsers = tablaUsers, permitsUser=permitsUser, 
-                           permitMapas=files)
+                           permitMapas=files, mappermits = mappermits)
 
 @auth.route("/new_user", methods=['POST'])
 @tipo_usuario_aceptado('admin')
@@ -145,13 +147,20 @@ def update_user(id):
             usuario.email = request.form.get('email')
             usuario.nombre = request.form.get('nombre')
             usuario.apellido = request.form.get('apellido')
-            print(usuario.tipo)
-            if usuario.tipo != 'admin':
-                usuario.tipo = request.form.get('rol')
-                db.session.commit()
-            else:
-                flash('El usuario a modificar es tipo Admin y no puede ser modificado directamente.', 'error')
+            usuario.tipo = request.form.get('rol')
+            db.session.commit()
+            
+            flash('Clave correcta. Usuario modificado.', 'warning')
+        else: 
+            flash('Clave incorrecta.', 'error')
     return redirect('/sing_up')
+
+@auth.route('/verificar_clave/<id>', methods=['GET', 'POST'])
+@login_required
+@tipo_usuario_aceptado('admin')
+def verificar_clave(id):
+    clave_correcta = request.form.get('clave') == 'saos1234'
+    return jsonify({'success': clave_correcta})
         
 @auth.route('/edit_permits', methods=['POST'])
 @login_required

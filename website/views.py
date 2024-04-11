@@ -31,6 +31,14 @@ def maps_users():
     mapdir = os.path.join(os.path.dirname(__file__), 'static', 'maps')
     files = os.listdir(mapdir)
     
+    id = {}
+    for permit in current_user.permits:
+        id = permit.id
+    
+    userDb = Permit.query.get(id == id)
+    mappermits_values = userDb.mappermits #type: ignore
+    files = [file for file in files if file.replace('.geojson', '') in mappermits_values]
+    
     centroides = []
     estados = []
     for archivo in files:
