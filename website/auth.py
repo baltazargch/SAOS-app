@@ -5,6 +5,8 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import login_user, login_required, logout_user, current_user
 from .utils import tipo_usuario_aceptado, new_user_const
 from email_validator import validate_email, EmailNotValidError
+import os
+import json
 
 # Esta es la vista de login. 
 auth = Blueprint('auth', __name__)
@@ -50,8 +52,18 @@ def sign_up():
         
     for user in tablaUsers:
         user.date = user.fecha.date() 
+        
+    mapdir = os.path.join(os.path.dirname(__file__), 'static', 'maps')
+    files = os.listdir(mapdir)
     
-    return render_template('admin_permits.html', user=current_user, tablaUsers = tablaUsers, permitsUser=permitsUser )
+    centroides = []
+    estados = []
+    for archivo in files:
+        with open(f'{mapdir}\\{archivo}') as f:
+            data = json.load(f)
+    
+    return render_template('admin_permits.html', user=current_user, tablaUsers = tablaUsers, permitsUser=permitsUser, 
+                           permitMapas=files)
 
 @auth.route("/new_user", methods=['POST'])
 @tipo_usuario_aceptado('admin')
@@ -120,8 +132,7 @@ def delete_user(id):
 @tipo_usuario_aceptado('admin')
 def edit_user(id):
     usuario = User.query.filter_by(id = id).first()
-    if usuario: 
-        print(usuario.tipo)
+    
     return render_template('admin_edit_contact.html', usuario=usuario, user=current_user)
 
 @auth.route('/update_user/<string:id>', methods=['POST'])
@@ -134,9 +145,12 @@ def update_user(id):
             usuario.email = request.form.get('email')
             usuario.nombre = request.form.get('nombre')
             usuario.apellido = request.form.get('apellido')
-            usuario.tipo = request.form.get('rol')
-
-            db.session.commit()
+            print(usuario.tipo)
+            if usuario.tipo != 'admin':
+                usuario.tipo = request.form.get('rol')
+                db.session.commit()
+            else:
+                flash('El usuario a modificar es tipo Admin y no puede ser modificado directamente.', 'error')
     return redirect('/sing_up')
         
 @auth.route('/edit_permits', methods=['POST'])

@@ -59,6 +59,7 @@
         <ul uk-tab style="padding-left: 2rem;">
             <li id='irusuarios' class="uk-active"><a href="#usuarios">Usuarios</a></li>
             <li id='irpermisos'><a href="#permisos">Permisos</a></li>
+            <li id='irmapas'><a href="#mappermits">Mapas</a></li>
         </ul>
         <ul class="uk-switcher uk-margin">
             <li id="tabusuarios">
@@ -113,8 +114,8 @@
                                 <tr>
                                     <th>Nombre</th>
                                     <th>Mapas</th>
-                                    <th>Loteos</th>
-                                    <th>Construcción</th>
+                                    <th>Cobranzas</th>
+                                    <th>Cash flow</th>
                                     <th>Acciones</th>
                                 </tr>
                             </thead>
@@ -150,6 +151,53 @@
                         </table>
                     </div>
                 </div>
+            </li>
+            <li id="tabmapas">
+                <p class=" uk-text-warning" style="padding-left: 2rem;"> A continuación se muestran los usuarios con
+                    permiso a loteos. Para
+                    modificar los permisos, hagalo usuario a usuario.</p>
+                <div id="mappermits" uk-grid>
+                    <div class="uk-width-auto">
+                        <ul class="uk-tab-left" uk-tab="connect: #content-permits">
+                            {%for pu in permitsUser%}
+                            {%if pu.mapas == 'Si'%}
+                            <li><a href="">{{pu.user.nombre}}</a></li>
+                            {%endif%}
+                            {%endfor%}
+                        </ul>
+                    </div>
+                    <ul id="content-permits" class="uk-switcher">
+                        {%for pu in permitsUser%}
+                        {%if pu.mapas == 'Si'%}
+                        <li>
+                            <div style="display: flex; justify-content: center; width: 50vw;">
+                                <form class="uk-form-horizontal" method="POST">
+                                    <legend class="uk-legend">Permisos de mapas disponibles</legend>
+
+                                    {%for pm in permitMapas %}
+                                    <div class="uk-margin-small">
+                                        <div class="uk-form-label">{{pm.replace('.geojson', '')}}</div>
+                                        <div class="uk-form-controls uk-form-controls-text">
+                                            <select class="uk-select" name="{{pm}}">
+                                                <option>Si</option>
+                                                <option selected>No</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    {%endfor%}
+                                    <div>
+                                        <button class="uk-button uk-button-secondary uk-width-1-1"
+                                            type="submit">Guardar</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </li>
+                        {%endif%}
+                        {%endfor%}
+                    </ul>
+                </div>
+
+
             </li>
         </ul>
     </div>
