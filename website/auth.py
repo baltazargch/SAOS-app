@@ -11,7 +11,7 @@ import json
 # Esta es la vista de login. 
 auth = Blueprint('auth', __name__)
 
-@auth.route('/login', methods=['GET', 'POST'])
+@auth.route('/', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
         email = request.form.get('email')
@@ -31,7 +31,7 @@ def login():
         else: 
             flash('El email ingresado no se encuentra registrado.', category='error')
            
-    return render_template('login.html', user=current_user)
+    return render_template('home.html', user=current_user)
 
 @auth.route('/logout')
 @login_required

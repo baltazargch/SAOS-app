@@ -4,8 +4,9 @@
 
 <script type="text/javascript" src="{{ url_for('static', filename='js/tabla-users.js')}}"> </script>
 
-<div style="display:flex; padding-left: 2rem; padding-top: 0.5rem; width: 95vw; height: 70vh;">
-    <div style="border-right: 1px solid rgba(0,0,0,0.2); padding-right:2rem;">
+<div
+    style="display:flex; padding-left: 1rem; padding-top:1rem; width: 95vw; height: 70vh; margin:auto; justify-content:center;">
+    <div style="border-right: 1px solid rgba(0,0,0,0.2); padding-right:1rem;">
         <form action="new_user" method='POST'>
             <fieldset class="uk-fieldset">
                 <legend class="uk-legend">Registrar un nuevo usuario</legend>
@@ -66,7 +67,7 @@
                 <div id='usuarios'
                     style="display:flex; padding-left: 2rem; padding-top: 0.5rem; width: 65vw; height: 70vh;">
                     <div class="uk-overflow-auto" style="justify-content:center; width:100%;">
-                        <table id="tabla-users" class="uk-table uk-table-small uk-table-divider">
+                        <table id="tabla-users" class="uk-table uk-table-small uk-table-divider uk-table-shrink">
                             <thead>
                                 <tr>
                                     <th>Nombre(s)</th>

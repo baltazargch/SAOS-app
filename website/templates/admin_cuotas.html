@@ -8,19 +8,21 @@
         <form action="/nuevo_cliente" method='POST'>
             <fieldset class="uk-fieldset">
                 <br>
-                <legend class="uk-legend">Agregar plan de cuotas para:</legend>
+                <legend class="uk-legend uk-text-bold">Nuevo plan de cuotas:</legend>
                 <div class="uk-form-controls">
                     <div class="uk-margin">
-                        <select id="userLotes" class="uk-select" aria-label="Select" name="userLotes">
-                            {%for userLot in usuarios_loteos %}
-                            <option value="{{ userLot.id }}"> {{ userLot.nombre + ' ' + userLot.apellido }}
-                            </option>
-                            {%endfor%}
-                        </select>
-                        <br>
+                        <div class="uk-form-controls uk-text-bold">
+                            <label class="uk-form-label" for="form-stacked-text">Usuario</label>
+                            <select id="userLotes" class="uk-select" aria-label="Select" name="userLotes">
+                                {%for userLot in usuarios_loteos %}
+                                <option value="{{ userLot.id }}"> {{ userLot.nombre + ' ' + userLot.apellido }}
+                                </option>
+                                {%endfor%}
+                            </select>
+                        </div>
                         <br>
                         <div class="uk-form-controls">
-                            <label class="uk-form-label" for="form-stacked-text">Cliente</label>
+                            <label class="uk-form-label" for="form-stacked-text">Comprador@</label>
                             <input type="text" class="uk-input" name="cliente" placeholder="Nombres de comprador@s">
                         </div>
                         <div class="uk-form-controls">

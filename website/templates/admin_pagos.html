@@ -1,7 +1,7 @@
 {% extends "base.html" %} {% block title %}Cuotas SAOS{% endblock %}
 
 {% block main_content %}
-<div style="width:95%; padding-left:1rem; height:100%;">
+<div style="padding-top:1rem; width: 85%;margin: auto;">
     <div uk-grid class="uk-child-width-expand">
         <div class="uk-width-1-6" style="height: 100%; padding-right:0.5rem;">
             <ul class="uk-nav-default" uk-nav>
@@ -11,7 +11,7 @@
                     <ul class="uk-nav-sub">
                         {%for ult in ultima %}
                         {%if ult.user == us.nombre + ' ' + us.apellido %}
-                        <li><a href="#" onclick="showPanel('{{ ult.cliente.replace(' ','-') }}')"> <!-- ignore -->
+                        <li><a href="#" onclick="showPanel('{{ ult.cliente.replace(' ','-') }}')">
                                 {{ult.siguiente_cuota_pagar.cliente + ' ' + ult.siguiente_cuota_pagar.lote }}
                             </a></li>
                         {%endif%}
@@ -27,6 +27,10 @@
             {%for ult in ultima %}
             {%if ult.user == us.nombre + ' ' + us.apellido %}
             <div id="{{ ult.cliente.replace(' ', '-') }}" style="width:100%; padding-bottom:10px;">
+                <h3 class="uk-heading-bullet uk-font-default">
+                    <span class="uk-text-background">{{ ult.siguiente_cuota_pagar.cliente.upper() + ' ' +
+                        ult.siguiente_cuota_pagar.lote.upper() }}</span>
+                </h3>
                 <div class="uk-child-width-1-2@m" uk-grid="masonry: pack" style="padding: 10px 10px 10px 10px;">
                     <div>
                         <div class="uk-card uk-card-default uk-card-body uk-box-shadow-large">
@@ -70,8 +74,8 @@
                         <hr>
                         <div style="display: flex; justify-content:center;">
                             <a href="/imprimir_cobranzas/{{ ult.siguiente_cuota_pagar.clienteid }}" target="_blank">
-                                <button class="uk-button uk-button-secondary uk-button-large"
-                                    id="generarPDF">Imprimir</button>
+                                <button class="uk-button uk-button-secondary uk-button-large" id="generarPDF">Imprimir
+                                    estado de cuenta</button>
                             </a>
                         </div>
                     </div>
@@ -85,6 +89,12 @@
                                 <h3 class="uk-card-title"><b>Última cuota pagada:</b></h3>
                                 <p>Fecha: {{ ult.ultima_cuota_pagada.fechacuota }}</p>
                                 <p>Monto: {{ ult.ultima_cuota_pagada.cuotapagadadolar }} USD</p>
+                                <div style="display: flex; justify-content:center;">
+                                    <a href="/imprimir_pago/{{ ult.siguiente_cuota_pagar.clienteid }}" target="_blank">
+                                        <button class="uk-button uk-button-secondary uk-button-large"
+                                            id="generarRecibo">Imprimir recibo</button>
+                                    </a>
+                                </div>
                             </div>
                         </div>
                         {% endif %}

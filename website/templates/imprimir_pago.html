@@ -97,17 +97,13 @@
                 </div>
                 {%for dat in dataCliente%}
                 <div>
-
                     <p><b>Deuda total: </b>{{ dat.totalDeuda}} USD</p>
                     <p><b>Saldo parcial: </b>{{dat.saldo_pendiente_cliente}} USD</p>
                     <p><b>Valor cuota: </b>{{dat.siguiente_cuota_pagar.cuotadolar}} USD</p>
-
                 </div>
                 <div>
-
                     <p><b>Fecha inicio: </b>{{dat.fecha_minima}}</p>
                     <p><b>Fecha fin: </b> {{dat.fecha_maxima}}</p>
-
                 </div>
                 {%endfor%}
                 {% endif %}
@@ -143,49 +139,65 @@
                 {%endfor%}
             </div>
         </div>
-        <!-- gráficos -->
         <br>
         <div style="padding: 0.5rem; border:1px dashed black; ">
-            <h4>Estado de la cuenta</h4>
-            <div>
-                {{grafica | safe}}
+            <div style="display: flex; justify-content:space-between; align-items:center;">
+                <h4>Resumen de cuenta</h4>
+                <div style="font-size:13px;">
+                    <p><b>Fecha de impresión: {{ today }}</b></p>
+                </div>
+            </div>
+            <hr>
+            <div style="display: flex; justify-content:space-between; font-size:13px;">
+                {% for cli in cliente %}
+                {% if loop.first %}
+                <div>
+                    <p><b>Cliente: </b> {{ cli.cliente }}</p>
+                    <p><b>Proyecto: </b>{{ cli.proyecto }}</p>
+                    <p><b>Lote: </b>{{ cli.lote }}</p>
+                </div>
+                {%for dat in dataCliente%}
+                <div>
+                    <p><b>Deuda total: </b>{{ dat.totalDeuda}} USD</p>
+                    <p><b>Saldo parcial: </b>{{dat.saldo_pendiente_cliente}} USD</p>
+                    <p><b>Valor cuota: </b>{{dat.siguiente_cuota_pagar.cuotadolar}} USD</p>
+                </div>
+                <div>
+                    <p><b>Fecha inicio: </b>{{dat.fecha_minima}}</p>
+                    <p><b>Fecha fin: </b> {{dat.fecha_maxima}}</p>
+                </div>
+                {%endfor%}
+                {% endif %}
+                {%endfor%}
             </div>
         </div>
-        <br>
-        <!-- detalle de cuotas totales -->
-        <br>
-        <div style="height: 100px;"></div>
-        <div style="padding: 0.5rem; border:1px dashed black; ">
-            <h4>Detalle de cuenta</h4>
-            <hr>
-            <div style="font-size:13px;">
-                <div class="uk-column-1-2 uk-column-divider">
-                    <table class="uk-table uk-table-small">
-                        <thead>
-                            <tr>
-                                <th class="uk-table-small">Cuota</th>
-                                <th class="uk-table-small">Fecha</th>
-                                <th class="uk-table-small">Estado</th>
-                                <th class="uk-table-small">Monto</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for cuota in cliente%}
-                            <tr>
-                                <td>{{cuota.idcuota}}</td>
-                                <td>{{cuota.fechacuota}}</td>
-                                <td>{{cuota.estadocuota}}</td>
-                                {%if cuota.cuotapagadadolar%}
-                                <td>{{cuota.cuotapagadadolar}}</td>
-                                {%else%}
-                                <td></td>
-                                {%endif%}
 
-                            </tr>
-                            {%endfor%}
-                        </tbody>
-                    </table>
+        <!-- detalle de cuota anterior, actual y siguiente -->
+        <br>
+        <div style="padding: 0.5rem; border:1px dashed black; ">
+            <h4>Últimas cuotas</h4>
+            <hr>
+            <div style="display: flex; justify-content:space-between; font-size:13px;">
+                {%for dat in dataCliente%}
+                <div>
+                    {%if dat.ultima_cuota_pagada %}
+                    <p><b>Fecha cuota anterior: </b>{{dat.ultima_cuota_pagada.fechacuota}}</p>
+                    <p><b>Monto pagado: </b>{{dat.ultima_cuota_pagada.cuotapagadadolar}} USD</p>
+                    {%endif%}
                 </div>
+                {%endfor%}
+                {%for dat in dataCliente%}
+                <div>
+                    <p><b>Fecha cuota actual: </b>{{dat.siguiente_cuota_pagar.fechacuota}}</p>
+                    <p><b>Monto pagado: </b>{{dat.siguiente_cuota_pagar.cuotadolar}} USD</p>
+                </div>
+                <div>
+                    {%if dat.cuota_posterior%}
+                    <p><b>Fecha cuota siguiente: </b>{{ dat.cuota_posterior.fechacuota}}</p>
+                    <p><b>Monto a pagar: </b>{{ dat.cuota_posterior.cuotadolar}} USD</p>
+                    {%endif%}
+                </div>
+                {%endfor%}
             </div>
         </div>
     </div>

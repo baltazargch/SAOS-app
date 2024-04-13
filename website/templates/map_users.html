@@ -2,8 +2,8 @@
 
 {% block main_content %}
 
-<div uk-grid>
-    <div class="uk-width-1-6" style="height: 600px; overflow-y:auto;">
+<div style="display:flex; margin:auto; flex-direction:row; width:95%;">
+    <div style="height: 600px; overflow-y:auto;  overflow-x:auto; width:20%;">
         <div style="border-right: 1px solid rgba(79, 78, 78, 0.563);">
             <h3 style="padding-left:0.5rem;">
                 <span class="uk-text-background"><b>Loteos SAOS</b></span>
@@ -38,8 +38,8 @@
             </ul>
         </div>
     </div>
-    <div class="uk-width-auto" style="width: 1250px;">
-        <div id="mapLot" style="height: 600px; width: 100%;"></div>
+    <div style="height:600px; width:80%; padding-left:2rem;">
+        <div id="mapLot" style="height: 600px; width: 90%;"></div>
     </div>
 </div>
 
@@ -125,7 +125,9 @@
         });
 
         layer
-            .bindPopup(e.target.feature.properties.nombrecompleto, {
+            .bindPopup(
+                e.target.feature.properties.nombrecompleto + '<br>' +
+                e.target.feature.properties.estado, {
                 closeButton: false,
             })
             .openPopup();
@@ -157,6 +159,17 @@
     function openFormModal(e) {
         //TODO: make css code
         let props = e.target.feature.properties;
+
+        let options = '';
+
+        // Generar las opciones del select según el estado actual
+        if (props.estado === 'VENDIDO') {
+            options = "<option>Reservado</option><option>Disponible</option>";
+        } else if (props.estado === 'RESERVADO') {
+            options = "<option>Disponible</option><option>Vendido</option>";
+        } else if (props.estado === 'DISPONIBLE') {
+            options = "<option>Reservado</option><option>Vendido</option>";
+        }
         UIkit.modal.dialog(
             '<form action="/modify_map" method="POST" class="uk-form-stacked">' +
             '<div class="wrapper-modal-lotes">' +
@@ -164,19 +177,18 @@
             '<div class="uk-modal-body">' +
             "<h3><b>Información del Lote</b></h3>" +
             '<label class="uk-form-label" for="form-stacked-text">Proyecto</label>' +
-            '<div class="uk-form-controls"><input class="uk-input" type="text" name="loteo" value="' +
+            '<div class="uk-form-controls"><input class="uk-input uk-disabled" type="text" name="loteo" value="' +
             props.loteo +
             '"></div></br>' +
             '<label class="uk-form-label" for="form-stacked-text">Lote</label>' +
-            '<div class="uk-form-controls"><input class="uk-input" type="text" name="parcela" value="' +
+            '<div class="uk-form-controls"><input class="uk-input uk-disabled" type="text" name="parcela" value="' +
             props.nombrecompleto +
             '"></div></br>' +
             '<div class="uk-form-controls"><input class="uk-input" type="text" id="comprador" placeholder="Comprador(es)"></div></br>' +
-            '<div class="uk-form-controls"><input class="uk-input" type="date" id="fechareserva"/> </div>' +
+            '<div class="uk-form-controls" hidden><input class="uk-input" type="date" id="fechareserva"/> </div>' +
             '<div class="uk-margin">' +
             '<select id="estado" class="uk-select" aria-label="Select" name="estado">' +
-            "<option>Reservado</option>" +
-            "<option>Vendido</option>" +
+            options +
             "</select>" +
             "</div>" +
             '<div class="uk-container">' +

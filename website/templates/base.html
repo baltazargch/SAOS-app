@@ -34,8 +34,6 @@
     <!-- link css home page -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css')}}">
 
-    <!-- link css home page -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/hexagon.css')}}">
 
     <title>{% block title %}Inicio{% endblock %}</title>
 </head>
@@ -50,23 +48,23 @@
                         <img class="uk-logo-inverse" src="{{ url_for('static', filename='/media/icon-saos.svg') }}"
                             style="height: 50px; width: 180px; display: inline-block;" alt="saos-logo">
                     </a>
+                    <ul class="uk-navbar-nav">
+                        {% if user.is_authenticated %}
+                        <li> {{ current_user.nombre.upper() + ' ' + current_user.apellido.upper()}} </li>
+                        {%endif%}
+                    </ul>
                 </div>
 
                 <div class="uk-navbar-right">
                     <ul class="uk-navbar-nav">
-                        <li><a href="/">Inicio</a></li>
-                        {% if user.is_authenticated %}
-                        <li> <a href="/dashboard">Mis servicios</a> </li>
-                        {%endif%}
                         {% if user.tipo == 'admin' %}
                         <li> <a href="/admindashboard">Admin SAOS</a> </li>
-                        {%endif%}
-                        {% if not user.is_authenticated %}
-                        <li><a href="/login"><ion-icon size="large" name="log-in-outline"></ion-icon>Acceso</a>
-                        </li>
-                        {% else %}
                         <li><a href="/logout">Salir<ion-icon name="log-out-outline"></ion-icon></a></li>
-                        {% endif %}
+                        {%elif user.is_authenticated%}
+                        <li> <a href="/dashboard">Mis servicios</a> </li>
+                        <li><a href="/logout">Salir<ion-icon name="log-out-outline"></ion-icon></a></li>
+                        {%endif%}
+
                     </ul>
                 </div>
             </div>

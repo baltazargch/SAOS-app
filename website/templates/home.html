@@ -1,30 +1,28 @@
-{% extends "base.html" %} {% block title %}Inicio{% endblock %}
+{% extends "base.html" %} {% block title %}Acceder{% endblock %}
 
 {% block main_content %}
 
-<div class="dash__div" style="padding: 0.5rem 5em;">
-    <h1 class="uk-heading-bullet uk-font-default">
-        <span class="uk-text-background">Bienvenid@ a SAOS:</span>
-        <hr>
-    </h1>
-    <p>Los siguientes, son los servicios que SAOS ofrece gratuitamente al público general. Te invitamos a probarlos. No
-        dudes en contactar al equipo SAOS para desbloquear el potencial de tus negocio y finanzas.</p>
-    <br>
-    <div>
-        <a href="/maps_no_user">
-        <div class="uk-card uk-card-default uk-grid-collapse uk-child-width-1-2@s uk-margin" uk-grid>
-                <div class="uk-card-media-left uk-cover-container">
-                    <img src="static/media/loteos.jpg" alt="" uk-cover>
-                    <canvas width="300" height="200"></canvas>
-                </div>
-                <div>
-                    <div class="uk-card-body">
-                        <h3 class="uk-card-title">Loteos</h3>
-                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt.
-                        </p>
+<div class="wrapper">
+    <form method="POST">
+        <div class="form-box-singup">
+            <div class="form-value">
+                <form action="" method="POST" id="form-login">
+                    <h2>Acceder</h2>
+                    <div class="inputbox">
+                        <ion-icon name="person-outline"></ion-icon>
+                        <label class="uk-form-label" for="form-stacked-text">Email</label>
+                        <input type="email" id="campo" name="email">
                     </div>
-                </div>
+                    <div class="inputbox">
+                        <ion-icon name="lock-closed-outline"></ion-icon>
+                        <label for="">Contraseña</label>
+                        <input type="password" id="password" name="password">
+                    </div>
+                    <button type="submit">Enviar</button>
+                </form>
             </div>
-        </a>
-    </div>
-    {% endblock %}
+        </div>
+    </form>
+</div>
+
+{% endblock %}

@@ -18,7 +18,7 @@
 }
 
 .container-all {
-  display: block;
+  display: flex;
 }
 
 .wrapper {
@@ -28,17 +28,17 @@
   min-height: 100vh;
   width: 100%;
   background-position: center;
-  background-size: cover;
+  background-size: contain;
   z-index: 0;
+  background-image: url("mapa-de-trabajo.svg");
 }
 .wrapper .form-box {
   position: relative;
-  width: 90%;
+  width: 100%;
   height: 350px;
   background: transparent;
   border: 2px solid rgba(255, 255, 255, 0.5);
   border-radius: 20px;
-  backdrop-filter: blur(10px);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -46,15 +46,16 @@
 }
 .wrapper .form-box-singup {
   position: relative;
-  width: 400px;
+  width: 500px;
   height: 350px;
-  background: transparent;
   border: 2px solid rgba(255, 255, 255, 0.5);
   border-radius: 20px;
   backdrop-filter: blur(10px);
   display: flex;
   justify-content: center;
   align-items: center;
+  top: -100px;
+  background: #303330ac; /* fallback for old browsers */
 }
 .wrapper h2 {
   font-size: 2em;
@@ -68,20 +69,9 @@
   border-bottom: 2px solid #fff;
 }
 .wrapper .inputbox label {
-  /* position: absolute; */
-  /* top: 50%; */
-  /*  left: 5px; */
-  /* transform: translateY(-50%); */
   color: #fff;
   font-size: 1em;
-  /* pointer-events: none;
-  transition: 0.5s; */
 }
-
-/* .wrapper input:focus ~ label,
-input:valid ~ label {
-  top: -15px;
-} */
 
 .wrapper .inputbox input {
   width: 100%;
@@ -90,7 +80,7 @@ input:valid ~ label {
   border: none;
   outline: none;
   font-size: 1em;
-  padding: 0 35px 0 5px;
+  padding: 0;
   color: #fff;
 }
 
@@ -99,34 +89,9 @@ input:valid ~ label {
   right: 8px;
   color: #fff;
   font-size: 1.2em;
-  top: 20px;
-}
-.wrapper .forget {
-  margin: -15px 0 15px;
-  font-size: 0.9em;
-  color: #fff;
-  display: flex;
-  justify-content: space-between;
+  top: 0;
 }
 
-.wrapper .forget a {
-  color: #fff;
-  text-decoration: none;
-  font-weight: 500;
-}
-.wrapper .forget a:hover {
-  text-decoration: underline;
-}
-.wrapper .forget label input {
-  margin-right: 3px;
-}
-.wrapper .forget label a {
-  color: #fff;
-  text-decoration: none;
-}
-.wrapper .forget label a:hover {
-  text-decoration: underline;
-}
 .wrapper button {
   width: 100%;
   height: 40px;
@@ -137,31 +102,6 @@ input:valid ~ label {
   cursor: pointer;
   font-size: 1em;
   font-weight: 600;
-}
-.wrapper .register {
-  font-size: 0.9em;
-  color: #fff;
-  text-align: center;
-  margin: 25px 0 10px;
-}
-.wrapper .register p a {
-  text-decoration: none;
-  color: #fff;
-  font-weight: 500;
-}
-.wrapper .register p a:hover {
-  text-decoration: underline;
-}
-
-#background-video {
-  position: fixed;
-  right: 0;
-  bottom: 0;
-  width: 100%;
-  height: 100%;
-  z-index: -2;
-  object-fit: fill;
-  padding: 0 10px 0 5px;
 }
 
 /* Styles for modal map users */
@@ -176,21 +116,6 @@ input:valid ~ label {
   height: 500px;
   width: 100%;
   border-radius: 20px;
-  background: #ada996; /* fallback for old browsers */
-  background: -webkit-linear-gradient(
-    to right,
-    #eaeaea,
-    #dbdbdb,
-    #f2f2f2,
-    #ada996
-  ); /* Chrome 10-25, Safari 5.1-6 */
-  background: linear-gradient(
-    to right,
-    #eaeaea,
-    #dbdbdb,
-    #f2f2f2,
-    #ada996
-  ); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
   background-position: center;
   background-size: cover;
 }
@@ -202,7 +127,6 @@ input:valid ~ label {
   background: transparent;
   border: 2px solid rgba(255, 255, 255, 0.5);
   border-radius: 20px;
-  backdrop-filter: blur(10px);
   display: flex;
   justify-content: center;
   align-items: center;

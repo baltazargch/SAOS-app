@@ -2,6 +2,7 @@
 
 {% block main_content %}
 <div style="width:99%; padding-left:0rem;">
+    {% if cuotas %}
     <div uk-grid class="uk-child-width-expand">
         <div class="uk-width-1-6">
             <ul class="uk-tab-left" uk-tab="connect: #component-tab-left; animation: uk-animation-fade"
@@ -146,6 +147,15 @@
             </ul>
         </div>
     </div>
+    {%else%}
+    <div style="width: 65%; margin:auto; padding-top:1rem;">
+        <h1>
+            <span class="uk-text-background">Aún no tienes clientes registrados. Contacta al equipo SAOS para empezar a
+                gestionar tus cobranzas.</span>
+            <hr>
+        </h1>
+    </div>
+    {%endif%}
 </div>
 <script>
     // Configuración de DataTables

@@ -15,11 +15,6 @@ from shapely import geometry, from_geojson
 views = Blueprint('views', __name__)
 
 # Definir las URL de cada página
-@views.route('/')
-def home():
-    return render_template("home.html", user=current_user)
-
-# Definir las URL de cada página
 @views.route('/maps_no_user')
 def maps_no_user():
     return render_template("maps-no-user.html", user=current_user)
@@ -31,14 +26,11 @@ def maps_users():
     mapdir = os.path.join(os.path.dirname(__file__), 'static', 'maps')
     files = os.listdir(mapdir)
     
-    id = {}
+    mappermits_values = {}
     for permit in current_user.permits:
-        id = permit.id
+        mappermits_values = permit.mappermits
     
-    userDb = Permit.query.get(id == id)
-    mappermits_values = userDb.mappermits #type: ignore
     files = [file for file in files if file.replace('.geojson', '') in mappermits_values]
-    
     centroides = []
     estados = []
     for archivo in files:
@@ -148,7 +140,10 @@ def admin_pagos():
                                         .filter_by(clienteid=cliente, estadocuota='Pagado').scalar()
                                                 
             totalDeuda = total_cuotas_cliente * siguiente_cuota_pagar.cuotadolar #type:ignore
-            saldo_pendiente_cliente  = totalDeuda - saldo_abonado   
+            if saldo_abonado:
+                saldo_pendiente_cliente  = totalDeuda - saldo_abonado 
+            else:
+                saldo_pendiente_cliente=totalDeuda
                
             labelColor=""
             estado = ""
@@ -184,33 +179,36 @@ def admin_pagos():
 def user_cuotas():
     if current_user.is_authenticated:
         cuotas = Cuotas.query.filter_by(user_id = current_user.id).all()
-                
-        next_cuotas = ultimas_cuotas(current_user.id)
-    
-        if cuotas:
-            for cuota in cuotas:   
-                cuota.fecha = cuota.fecha.date()
-                
-            # Realiza una consulta para obtener valores únicos de la columna "cliente"
-            clientes_unicos = Cuotas.query.filter_by(user_id = current_user.id)\
-                .with_entities(Cuotas.cliente, Cuotas.clienteid).distinct()\
-                        .all()
-            
-            temp_dict = {}
-
-            # Iterar sobre los datos originales
-            for cliente, clienteid in clientes_unicos:
-                # Si el cliente ya está en el diccionario, agregamos el clienteid a la lista existente
-                if cliente in temp_dict:
-                    temp_dict[cliente].append(clienteid)
-                # Si el cliente no está en el diccionario, creamos una nueva lista con el clienteid
-                else:
-                    temp_dict[cliente] = [clienteid]
-
-            # Convertir el diccionario en la lista de diccionarios deseada
-            clientes_unicos = [{'cliente': cliente, 'cuentasid': tuple(ids)} for cliente, ids in temp_dict.items()]
         
-    return render_template('user_cuotas.html', user=current_user, cuotas=cuotas, clientes=clientes_unicos, next_cuotas=next_cuotas)
+        if cuotas:        
+            next_cuotas = ultimas_cuotas(current_user.id)
+        
+            if cuotas:
+                for cuota in cuotas:   
+                    cuota.fecha = cuota.fecha.date()
+                    
+                # Realiza una consulta para obtener valores únicos de la columna "cliente"
+                clientes_unicos = Cuotas.query.filter_by(user_id = current_user.id)\
+                    .with_entities(Cuotas.cliente, Cuotas.clienteid).distinct()\
+                            .all()
+                
+                temp_dict = {}
+
+                # Iterar sobre los datos originales
+                for cliente, clienteid in clientes_unicos:
+                    # Si el cliente ya está en el diccionario, agregamos el clienteid a la lista existente
+                    if cliente in temp_dict:
+                        temp_dict[cliente].append(clienteid)
+                    # Si el cliente no está en el diccionario, creamos una nueva lista con el clienteid
+                    else:
+                        temp_dict[cliente] = [clienteid]
+
+                # Convertir el diccionario en la lista de diccionarios deseada
+                clientes_unicos = [{'cliente': cliente, 'cuentasid': tuple(ids)} for cliente, ids in temp_dict.items()]
+            return render_template('user_cuotas.html', user=current_user, cuotas=cuotas, clientes=clientes_unicos, next_cuotas=next_cuotas)
+        else: 
+            cuotas = None
+    return render_template('user_cuotas.html', user=current_user, cuotas=cuotas)
 
 @views.route('/imprimir_cobranzas/<id>', methods=['GET'])
 @login_required
@@ -276,4 +274,70 @@ def print_cobranzas(id):
     
     
     return render_template('imprimir_cobranza.html', cliente=cuotas_cliente, grafica=grafica, 
+                           dataCliente = resultados, today=today, icliente=icliente)
+    
+@views.route('/imprimir_pago/<id>', methods=['GET'])
+@login_required
+def imprimir_pago(id):
+    cuotas_cliente = Cuotas.query.filter_by(clienteid=id).all()
+    icliente =  Cuotas.query.filter_by(clienteid=id).first()
+    if icliente:
+        cliente = icliente.cliente
+        idcliente = icliente.clienteid
+    # Contar las cuotas pagadas y pendientes
+    cuotas_pagadas = sum(1 for cuota in cuotas_cliente if cuota.estadocuota == 'Pagado')
+    cuotas_pendientes = sum(1 for cuota in cuotas_cliente if cuota.estadocuota == 'Pendiente')
+
+    # Crear los datos de la gráfica
+    labels = ['Pagadas', 'Pendientes']
+    valores = [cuotas_pagadas, cuotas_pendientes]
+
+   # Crea el gráfico circular utilizando Plotly
+    fig = go.Figure(data=[go.Pie(labels=labels, values=valores)])
+    grafica = fig.to_html(full_html=False)
+    
+    # Lista para almacenar los resultados
+    resultados = []
+    ultima_cuota_pagada = Cuotas.query.filter_by(clienteid=idcliente, estadocuota='Pagado') \
+                                            .order_by(Cuotas.fechacuota.desc()).first()
+            # Obtener la siguiente cuota a pagar para el cliente actual
+    siguiente_cuota_pagar = Cuotas.query.filter_by(clienteid=idcliente, estadocuota='Pendiente') \
+                                                .order_by(Cuotas.fechacuota).first()
+    
+    cuota_posterior = Cuotas.query.filter(
+        Cuotas.clienteid == idcliente,
+        Cuotas.estadocuota == 'Pendiente',
+        Cuotas.fechacuota > siguiente_cuota_pagar.fechacuota).order_by(Cuotas.fechacuota).first()    #type: ignore 
+                                    
+            # Calcular el total de cuotas y el saldo pendiente
+    total_cuotas_cliente = Cuotas.query.filter_by(clienteid=idcliente).count()
+    saldo_abonado = db.session.query(func.sum(Cuotas.cuotapagadadolar)) \
+                                        .filter_by(clienteid=idcliente, estadocuota='Pagado')\
+                                            .scalar()
+                                                
+    totalDeuda = total_cuotas_cliente * siguiente_cuota_pagar.cuotadolar #type:ignore
+    saldo_pendiente_cliente  = totalDeuda - saldo_abonado   
+    
+    fechas_cuotas = [cuota.fechacuota for cuota in cuotas_cliente]
+
+    # Calcula la fecha máxima y mínima
+    fecha_maxima = max(fechas_cuotas)
+    fecha_minima = min(fechas_cuotas)
+
+    # Agregar los resultados a la lista
+    resultados.append({
+                'cliente': cliente,
+                'ultima_cuota_pagada': ultima_cuota_pagada,
+                'siguiente_cuota_pagar': siguiente_cuota_pagar, 
+                'saldo_pendiente_cliente': saldo_pendiente_cliente,
+                'cuota_posterior':cuota_posterior,
+                'saldo_abonado': saldo_abonado,
+                'totalDeuda':totalDeuda,
+                'fecha_maxima': fecha_maxima,
+                'fecha_minima': fecha_minima
+            })
+    today = datetime.now().date()
+    
+    
+    return render_template('imprimir_pago.html', cliente=cuotas_cliente, grafica=grafica, 
                            dataCliente = resultados, today=today, icliente=icliente)

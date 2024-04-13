@@ -5,6 +5,19 @@ from flask_login import login_manager, LoginManager
 from werkzeug.security import generate_password_hash
 
 db = SQLAlchemy()
+# DB_NAME = "mysql+mysqlconnector://{username}:{password}@{hostname}/{databasename}".format(
+    # username="baltazargch",
+    # password="rhapsody-999",
+    # hostname="baltazargch.mysql.pythonanywhere-services.com",
+    # databasename="baltazargch$saosdata",
+    # )
+
+# def create_app():
+#     app = Flask(__name__)
+#     app.config['SECRET_KEY'] = 'asdasdasdasdsaos12341025715'
+#     # Databse inside app
+#     app.config['SQLALCHEMY_DATABASE_URI'] = DB_NAME
+    
 DB_NAME = 'database.db'
 
 def create_app():
