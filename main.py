@@ -45,4 +45,4 @@ def modify_map():
     return redirect(url_for('views.maps_users', loteo=loteo, clickloteo=True))
 
 if __name__ == '__main__':
-    app.run()
+    app.run(debug=True)

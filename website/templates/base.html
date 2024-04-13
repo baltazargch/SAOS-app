@@ -41,10 +41,18 @@
 </head>
 
 <body>
-    <nav class="uk-navbar-container">
+    <nav class="uk-navbar-container" style="background: #333;">
         <div class="uk-container">
             <div uk-navbar>
+
                 <div class="uk-navbar-left">
+                    <a class="uk-navbar-item uk-logo" href="https://saos.app/" aria-label="Back to Home">
+                        <img class="uk-logo-inverse" src="{{ url_for('static', filename='/media/icon-saos.svg') }}"
+                            style="height: 50px; width: 180px; display: inline-block;" alt="saos-logo">
+                    </a>
+                </div>
+
+                <div class="uk-navbar-right">
                     <ul class="uk-navbar-nav">
                         <li><a href="/">Inicio</a></li>
                         {% if user.is_authenticated %}
@@ -53,21 +61,10 @@
                         {% if user.tipo == 'admin' %}
                         <li> <a href="/admindashboard">Admin SAOS</a> </li>
                         {%endif%}
-                    </ul>
-                </div>
-                <div style="display:flex; align-items:center; justify-content:center; width:100%;">
-                    <a class="uk-navbar-item uk-logo" href="https://saos.app/">
-                        <img src="{{ url_for('static', filename='/media/saos-nuevo-negro.svg') }}"
-                            style="height: 3.5rem; width:auto; display: inline-block;" alt="saos-logo">
-                    </a>
-                </div>
-
-                <div class="uk-navbar-right">
-                    <ul class="uk-navbar-nav">
                         {% if not user.is_authenticated %}
-                        <li><a href="/login">Acceder</a></li>
+                        <li><a href="/login"><ion-icon size="large" name="log-in-outline"></ion-icon>Acceso</a>
+                        </li>
                         {% else %}
-                        <!--  <li><a href="/maps_users">Mis loteos</a></li> -->
                         <li><a href="/logout">Salir<ion-icon name="log-out-outline"></ion-icon></a></li>
                         {% endif %}
                     </ul>
