@@ -15,7 +15,8 @@
                 {%if c.name == f %}
                 <li>
                     <a href="#" class="uk-accordion-title uk-text-small" style="text-decoration: none;"
-                        onclick="irLoteo({{c.coords[1]}}, {{c.coords[0]}})"> <b>{{ f.replace('.geojson', '')}}</b></a>
+                        id="{{ f.replace('.geojson', '')}}" onclick="irLoteo({{c.coords[1]}}, {{c.coords[0]}})"> <b>{{
+                            f.replace('.geojson', '')}}</b></a>
                     <div class="uk-accordion-content" style="padding: 0 0.5rem 0 0.5rem;">
                         {%for estado in estados %}
                         {%if estado.name == f %}
