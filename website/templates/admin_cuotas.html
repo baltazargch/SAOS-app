@@ -25,10 +25,17 @@
                             <label class="uk-form-label" for="form-stacked-text">Comprador@</label>
                             <input type="text" class="uk-input" name="cliente" placeholder="Nombres de comprador@s">
                         </div>
+                        <!-- Proyecto -->
                         <div class="uk-form-controls">
                             <label class="uk-form-label" for="form-stacked-text">Proyecto de loteo</label>
-                            <input type="text" class="uk-input" name="proyecto" placeholder="Nombre del loteo">
+                            <select class="uk-select" id="form-stacked-select" name="proyecto"
+                                placeholder="Nombre del loteo" required>
+                                {%for cobranza in cobranzas%}
+                                <option>{{cobranza.proyecto}}</option>
+                                {%endfor%}
+                            </select>
                         </div>
+
                         <div class="uk-form-controls">
                             <label class="uk-form-label" for="form-stacked-text">Lote</label>
                             <input type="text" class="uk-input" name="lote" placeholder="Nombre del lote">
@@ -74,7 +81,7 @@
                                         <div class="uk-margin">
                                             <div class="uk-form-controls">
                                                 <label class="uk-form-label" for="form-stacked-text">Nombre</label>
-                                                <input type="text" class="uk-input" name="cliente"
+                                                <input type="text" class="uk-input" name="proyect"
                                                     placeholder="e.g., Miraflores">
                                             </div>
                                         </div>
@@ -98,6 +105,7 @@
                                     <th>Proyecto</th>
                                     <th>Fecha creación</th>
                                     <th>Creado por</th>
+                                    <th>Acción</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -106,7 +114,13 @@
                                     <td>{{cobranza.id}}</td>
                                     <td>{{cobranza.proyecto}}</td>
                                     <td>{{cobranza.fecha}}</td>
-                                    <td>{{cobranza.user}}</td>
+                                    <td>{{cobranza.user.nombre}}</td>
+                                    <td>
+                                        <form action="/delete_cobranza/{{ cobranza.id }}" method="POST">
+                                            <button class="delete-proyect uk-button-small uk-button-danger"
+                                                type="submit">Elimnar</button>
+                                        </form>
+                                    </td>
                                 </tr>
                                 {%endfor%}
                             </tbody>
@@ -184,6 +198,19 @@
             ordering: false, // Desactivar ordenamiento de columnas
         });
     });
+
+    const btnDelete = document.querySelectorAll('.delete-proyect');
+
+    if (btnDelete) {
+        arrayDelete = Array.from(btnDelete);
+        arrayDelete.forEach((btn) => {
+            btn.addEventListener('click', (e) => {
+                if (!confirm('¿Estás seguro de que quieres eliminar este usuario?')) {
+                    e.preventDefault();
+                }
+            });
+        });
+    };
 
 </script>
 {%endblock%}

@@ -1,10 +1,11 @@
 {% extends "base.html" %} {% block title %} Cuotas SAOS {% endblock %}
 
 {% block main_content %}
-<div style="width:99%; padding-left:0rem;">
+<div style="width:80%; padding-left:1rem; margin:auto;">
     {% if cuotas %}
     <div uk-grid class="uk-child-width-expand">
-        <div class="uk-width-1-6">
+
+        <div id="sidebar" class="uk-width-auto@m uk-visible">
             <ul class="uk-tab-left" uk-tab="connect: #component-tab-left; animation: uk-animation-fade"
                 style="padding-left: 0.5rem;" uk-tab>
                 {% for cliente in clientes %}
@@ -37,12 +38,18 @@
                 {% endfor %}
             </ul>
         </div>
-        <div class="uk-width-5-6">
+
+        <div class="uk-width-auto@s uk-hidden@m">
+            <!-- Botón para mostrar/ocultar la columna lateral en dispositivos pequeños -->
+            <button class="uk-button uk-button-default uk-margin-small-right" type="button"
+                uk-toggle="target: #sidebar"><ion-icon name="menu-outline"></ion-icon></button>
+        </div>
+        <div class="uk-width-expand">
             <ul id="component-tab-left" class="uk-switcher">
                 {%for cliente in clientes %}
                 {% for id in cliente.cuentasid %}
                 <li>
-                    <div style="display: flex; justify-content:space-between; align-items:center;">
+                    <div class="user__cuotas" style="display: flex; justify-content:space-between; align-items:center;">
                         <div>
                             <h2> <span class="uk-text-background"> Estado de cuenta: {{
                                     cliente.cliente }}</span></h2>
@@ -57,7 +64,7 @@
                     {%if nxct.cliente == id %}
                     <div class="uk-child-width-1-2@m" uk-grid>
                         <div>
-                            <div class="uk-card uk-card-default uk-card-body">
+                            <div class="uk-card uk-card-default uk-card-body uk-margin-small">
                                 <h3 class="uk-card-title"><b><ion-icon name="id-card-outline" size="large"></ion-icon>
                                         Datos
                                         de cuenta:</b></h3>
@@ -85,7 +92,7 @@
                         <div>
                             {% if nxct.ultima_cuota_pagada %}
                             <div>
-                                <div class="uk-card uk-card-default uk-card-body">
+                                <div class="uk-card uk-card-default uk-card-body uk-margin-small">
                                     <div class="uk-card-badge uk-label-success">{{ nxct.ultima_cuota_pagada.estadocuota
                                         }}
                                     </div>
@@ -111,35 +118,46 @@
                     {%endif%}
                     {%endfor%}
                     <hr>
-                    <div id="{{'tab'+id}}" style="padding-left: 0.5rem; width:100%;">
-                        <table id="tabla-{{cliente.cliente}}"
-                            class="uk-table uk-table-small uk-table-divider tabla-cuotas-user">
-                            <thead>
-                                <tr>
-                                    <th>Cliente</th>
-                                    <th>Cuota</th>
-                                    <th>Fecha a pagar</th>
-                                    <th>Estado del pago</th>
-                                    <th>Monto pagado</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for cuota in cuotas if cuota.clienteid == id %}
-                                <tr>
-                                    <td>{{cuota.cliente}}</td>
-                                    <td>{{cuota.idcuota}}</td>
-                                    <td>{{cuota.fechacuota}}</td>
-                                    <td>{{cuota.estadocuota}}</td>
-                                    {%if cuota.cuotapagadadolar%}
-                                    <td>{{cuota.cuotapagadadolar}}</td>
-                                    {%else%}
-                                    <td></td>
-                                    {%endif%}
+                    <div>
+                        <div class="uk-width-auto@s uk-hidden@m">
+                            <!-- Botón para mostrar/ocultar la columna lateral en dispositivos pequeños -->
+                            <button class="uk-button uk-button-default uk-margin-small-right" type="button"
+                                uk-toggle="target: #tablehide; cls: uk-visible@s"><ion-icon
+                                    name="menu-outline"></ion-icon> Detalle de
+                                cuotas</button>
+                        </div>
+                        <div id="tablehide" class="uk-width-auto@m uk-visible@s">
+                            <div id="{{'tab'+id}}" style="padding-left: 0.5rem; width:90%; overflow-x: auto;">
+                                <table id="tabla-{{cliente.cliente}}"
+                                    class="uk-table uk-table-small uk-table-divider tabla-cuotas-user">
+                                    <thead>
+                                        <tr class="uk-text-small uk-margin-small">
+                                            <th>Cliente</th>
+                                            <th>Cuota</th>
+                                            <th>Fecha a pagar</th>
+                                            <th>Estado del pago</th>
+                                            <th>Monto pagado</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for cuota in cuotas if cuota.clienteid == id %}
+                                        <tr class="uk-text-small uk-margin-small">
+                                            <td>{{cuota.cliente}}</td>
+                                            <td>{{cuota.idcuota}}</td>
+                                            <td>{{cuota.fechacuota}}</td>
+                                            <td>{{cuota.estadocuota}}</td>
+                                            {%if cuota.cuotapagadadolar%}
+                                            <td>{{cuota.cuotapagadadolar}}</td>
+                                            {%else%}
+                                            <td></td>
+                                            {%endif%}
 
-                                </tr>
-                                {%endfor%}
-                            </tbody>
-                        </table>
+                                        </tr>
+                                        {%endfor%}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
                     </div>
                 </li>
                 {%endfor%}

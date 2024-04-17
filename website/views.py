@@ -6,6 +6,7 @@ from . import db
 from sqlalchemy import func
 from datetime import datetime
 import plotly.graph_objs as go
+import plotly.io as pio
 import os
 import geojson
 import json
@@ -33,6 +34,8 @@ def maps_users():
     files = [file for file in files if file.replace('.geojson', '') in mappermits_values]
     centroides = []
     estados = []
+    datos = []
+    graphs = []
     for archivo in files:
         with open(f'{mapdir}\\{archivo}') as f:
             data = geojson.load(f)
@@ -40,16 +43,31 @@ def maps_users():
             centroides.append({"name": archivo, "coords": geometria.centroid.coords[:][0]})
             feat = data['features'][:]
             feat = json.loads(json.dumps(feat))
+            disp = sum(1 for fe in feat if fe['properties']['estado'] == 'DISPONIBLE')
+            rese = sum(1 for fe in feat if fe['properties']['estado'] == 'RESERVADO')
+            vend = sum(1 for fe in feat if fe['properties']['estado'] == 'VENDIDO')
             
             estados.append({
                 'name': archivo, 
-                'disponibles':sum(1 for fe in feat if fe['properties']['estado'] == 'DISPONIBLE'), 
-                'reservados':  sum(1 for fe in feat if fe['properties']['estado'] == 'RESERVADO'), 
-                'vendidos':  sum(1 for fe in feat if fe['properties']['estado'] == 'VENDIDO'), 
+                'disponibles': disp, 
+                'reservados': rese, 
+                'vendidos': vend, 
                 'total': sum(1 for fe in feat)
             })
             
-    return render_template("map_users.html", user=current_user, files=files, centroides=centroides, estados=estados)
+            
+            graphs.append({
+                'name': archivo, 
+                'graph': pio.to_html(go.Figure(data=[go.Pie(labels=['Disponibles', 'Reservados', 'Vendidos'], 
+                                                values=[disp, rese, vend])]).update_traces(hole=0.4), full_html=False)
+            })
+            
+            datos.append(
+                [fe['properties'] for fe in feat[0:10]]
+            )
+            
+    return render_template("map_users.html", user=current_user, files=files, centroides=centroides, 
+                           estados=estados, datos=datos, graphs=graphs)
 
 @views.route('/dashboard')
 @login_required

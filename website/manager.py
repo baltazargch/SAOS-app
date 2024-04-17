@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, request, flash, redirect, url_for, Response, send_file
-from .models import User, Permit, Cuotas
+from .models import User, Permit, Cuotas, Cobranza
 from . import db
 from flask_login import login_required, current_user
 from .utils import tipo_usuario_aceptado, crear_cuotas_usuario, generar_csv_cuotas
@@ -91,4 +91,40 @@ def set_maps_permits(id):
         userDb.mappermits = maps_json #type: ignore
         db.session.commit()
     return redirect('/sing_up?tab=mappermits')
+
+
+@manager.route('/delete_cobranza/<string:id>', methods=['POST'])
+@login_required
+@tipo_usuario_aceptado('admin')
+def delete_cobranza(id):
+    proyecto = Cobranza.query.filter_by(id = id).first()
+    if proyecto:
+        db.session.delete(proyecto)
+        db.session.commit()
+        flash('Proyecto eliminado correctamente.', 'success')
+    return redirect('/admincuotas')
+
+
+@manager.route('/add_cobranza', methods=['POST'])
+@login_required
+@tipo_usuario_aceptado('admin')
+def add_cobranza():
+    if request.method == 'POST':
+        newproyect = request.form.get('proyect')
+        if newproyect:
+            existe = Cuotas.query.filter_by(proyecto=newproyect.upper()).first()
+            if existe: 
+                flash('El proyecto a crear {}, ya existe'.format(newproyect.upper()), 'error')
+            else:
+                newCobranza = Cobranza(
+                    fecha=datetime.now().date(), 
+                    proyecto=newproyect.upper(), 
+                    user_id=current_user.id, 
+                    user=current_user)# type: ignore
+                db.session.add(newCobranza)
+                db.session.commit()
+                flash('¡Nuevo proyecto creado!', 'sucess')
+              
+    return redirect('/admincuotas')
+    
 

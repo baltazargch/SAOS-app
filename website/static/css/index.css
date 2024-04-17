@@ -239,6 +239,17 @@
     font-size: 14px;
     border-bottom: 2px solid #387c6c;
   }
+
+  .user__cuotas {
+    display: flex;
+    flex-direction: column;
+  }
+  .user__cuotas h2 {
+    font-size: 14px;
+  }
+  .user__cuotas uk-button {
+    font-size: 10px;
+  }
 }
 
 .dash__div a:hover {
