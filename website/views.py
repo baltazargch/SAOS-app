@@ -30,7 +30,10 @@ def maps_users():
     mappermits_values = {}
     for permit in current_user.permits:
         mappermits_values = permit.mappermits
-    
+        
+    def obtener_fecha(x):
+        return datetime.strptime(x['properties']['fecha'], '%Y-%m-%d')
+        
     files = [file for file in files if file.replace('.geojson', '') in mappermits_values]
     centroides = []
     estados = []
@@ -55,15 +58,20 @@ def maps_users():
                 'total': sum(1 for fe in feat)
             })
             
-            
             graphs.append({
                 'name': archivo, 
                 'graph': pio.to_html(go.Figure(data=[go.Pie(labels=['Disponibles', 'Reservados', 'Vendidos'], 
                                                 values=[disp, rese, vend])]).update_traces(hole=0.4), full_html=False)
             })
             
+            feat_with_date = [fe for fe in feat if fe['properties'].get('fecha') is not None]
+            
+            # Ordenar las características por fecha de forma descendente
+            feat_ordenadas = sorted(feat_with_date, key=obtener_fecha, reverse=True)
+
+            # Seleccionar las primeras 10 características después de ordenar
             datos.append(
-                [fe['properties'] for fe in feat[0:10]]
+                [fe['properties'] for fe in feat_ordenadas[:10]]
             )
             
     return render_template("map_users.html", user=current_user, files=files, centroides=centroides, 

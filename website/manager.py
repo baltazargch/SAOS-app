@@ -128,3 +128,56 @@ def add_cobranza():
     return redirect('/admincuotas')
     
 
+@manager.route('/modify_map', methods=['POST']) # type: ignore
+def modify_map():  
+    if request.method == 'POST':
+        usuario = current_user.nombre
+      
+        loteo = request.form.get('loteo')
+        parcela =request.form.get('parcela')
+        comprador =request.form.get('comprador')
+        nuevo_estado = request.form['estado']
+       
+        # Determinar qué archivo GeoJSON leer según la información del modal
+        nombre_archivo = loteo + '.geojson'  # type: ignore
+        ruta_archivo = os.path.join(os.path.dirname(__file__), 'static', 'maps', nombre_archivo) # type: ignore
+        
+         # Leer el contenido del archivo GeoJSON
+        with open(ruta_archivo, 'r') as f:
+            contenido_geojson = json.load(f)
+
+        # Iterar sobre las características (features) del archivo GeoJSON
+        for feature in contenido_geojson['features']:
+             # Si el lote está vendido o reservado, verifica el usuario, si no tiene permisos -> error
+            if feature['properties']['nombrecompleto'] == parcela:
+                if feature['properties']['estado'] in ['RESERVADO','VENDIDO']:
+                    if not feature['properties']['usuario'] == usuario:
+                        clickloteo=False
+                        break
+                    else:
+                    # Verificar si la propiedad "Parcela" es igual a "Parcela 1"
+                        if not feature['properties']['estado'] == nuevo_estado.upper():
+                            # Actualizar la propiedad "Estado" solo para la característica que cumpla con la condición
+                            feature['properties']['estado'] = nuevo_estado.upper()
+                            feature['properties']['fecha'] = str(datetime.now().date())
+                            feature['properties']['comprador'] = comprador
+                            feature['properties']['usuario'] = usuario
+                            clickloteo = True
+                # Si el lote está disponible, no verifica el usuario y realiza la operación
+                elif feature['properties']['estado'] == 'DISPONIBLE':
+                    # Verificar si la propiedad "Parcela" es igual a "Parcela 1"
+                    if not feature['properties']['estado'] == nuevo_estado.upper():
+                        # Actualizar la propiedad "Estado" solo para la característica que cumpla con la condición
+                        feature['properties']['estado'] = nuevo_estado.upper()
+                        feature['properties']['fecha'] = str(datetime.now().date())
+                        feature['properties']['comprador'] = comprador
+                        feature['properties']['usuario'] = usuario
+                        clickloteo = True
+
+        # Guardar los cambios en el archivo GeoJSON modificado
+        with open(ruta_archivo, 'w') as f:
+            json.dump(contenido_geojson, f)
+            
+    return redirect(url_for('views.maps_users', loteo=loteo, clickloteo=clickloteo))
+
+

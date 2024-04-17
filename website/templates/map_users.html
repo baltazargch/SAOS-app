@@ -3,115 +3,134 @@
 {% block main_content %}
 
 <div style="margin:auto; width:80%;">
-    <div uk-grid>
-        <div class="uk-width-auto" style="height: 500px; overflow-y:auto; overflow-x:auto;">
-            <div style="border-right: 1px solid rgba(79, 78, 78, 0.563);">
-                <h3 style="padding-left:0.5rem;">
-                    <span class="uk-text-background"><b>Loteos SAOS</b></span>
-                </h3>
-                <hr>
-                <ul class="uk-list uk-list-divider" uk-accordion style="padding-left:0.5rem;">
-                    {%for f in files%}
-                    {%for c in centroides%}
-                    {%if c.name == f %}
-                    <li>
-                        <a href="#" class="uk-accordion-title uk-text-small" style="text-decoration: none;"
-                            id="{{ f.replace('.geojson', '')}}" onclick="irLoteo({{c.coords[1]}}, {{c.coords[0]}})">
-                            <b>{{
-                                f.replace('.geojson', '')}}</b></a>
-                        <div class="uk-accordion-content" style="padding: 0 0.5rem 0 0.5rem;">
-                            {%for estado in estados %}
-                            {%if estado.name == f %}
-                            <div class="uk-padding-remove">
-                                <p style="font-size: small; color:green;margin: 0;"> Disponibles: {{estado.disponibles}}
-                                </p>
-                                <p style="font-size: small; color:rgb(128, 0, 0);margin: 0;"> Vendidos:
-                                    {{estado.vendidos}}</p>
-                                <p style="font-size: small; color:rgb(26, 28, 121);margin: 0;"> Reservados:
-                                    {{estado.reservados}}</p>
-                                <p style="font-size: small; color:rgb(47, 47, 47);margin: 0;"> Totales: {{estado.total}}
-                                </p>
-                            </div>
+    <ul uk-tab>
+        <li><a href="#">Mapa</a></li>
+        <li><a href="#">Movimientos</a></li>
+    </ul>
+    <ul class="uk-switcher uk-margin">
+        <li>
+            <div uk-grid>
+                <div class="uk-width-auto" style="height: 500px; overflow-y:auto; overflow-x:auto;">
+                    <div style="border-right: 1px solid rgba(79, 78, 78, 0.563);">
+                        <h3 style="padding-left:0.5rem;">
+                            <span class="uk-text-background"><b>Loteos SAOS</b></span>
+                        </h3>
+                        <hr>
+                        <ul class="uk-list uk-list-divider" uk-accordion style="padding-left:0.5rem;">
+                            {%for f in files%}
+                            {%for c in centroides%}
+                            {%if c.name == f %}
+                            <li>
+                                <a href="#" class="uk-accordion-title uk-text-small" style="text-decoration: none;"
+                                    id="{{ f.replace('.geojson', '')}}"
+                                    onclick="irLoteo({{c.coords[1]}}, {{c.coords[0]}})">
+                                    <b>{{
+                                        f.replace('.geojson', '')}}</b></a>
+                                <div class="uk-accordion-content" style="padding: 0 0.5rem 0 0.5rem;">
+                                    {%for estado in estados %}
+                                    {%if estado.name == f %}
+                                    <div class="uk-padding-remove">
+                                        <p style="font-size: small; color:green;margin: 0;"> Disponibles:
+                                            {{estado.disponibles}}
+                                        </p>
+                                        <p style="font-size: small; color:rgb(128, 0, 0);margin: 0;"> Vendidos:
+                                            {{estado.vendidos}}</p>
+                                        <p style="font-size: small; color:rgb(26, 28, 121);margin: 0;"> Reservados:
+                                            {{estado.reservados}}</p>
+                                        <p style="font-size: small; color:rgb(47, 47, 47);margin: 0;"> Totales:
+                                            {{estado.total}}
+                                        </p>
+                                    </div>
+                                    {%endif%}
+                                    {%endfor%}
+                                </div>
+
+                            </li>
                             {%endif%}
                             {%endfor%}
-                        </div>
+                            {%endfor%}
+                        </ul>
+                    </div>
+                </div>
+                <div class="uk-width-expand" style="height:500px; padding-left:1rem;">
+                    <div id="mapLot" style="height: 500px; width: 100%;"></div>
+                </div>
+            </div>
+        </li>
+        <li>
+            <div>
+                <h3 style="padding-left:0.5rem;">
+                    <span class="uk-text-background"><b> Últimos movimientos: </b></span>
+                </h3>
+                <ul uk-tab>
+                    {%for dat in datos%}
+                    {%for f in files%}
+                    {%if f.replace('.geojson', '') == dat[0].loteo %}
+                    <li>
+                        <a href="#">
+                            <h6 class="uk-text-small"> {{ dat[0].loteo }} </h6>
+                        </a>
+                    </li>
+                    {%endif%}
+                    {%endfor%}
+                    {%endfor%}
+                </ul>
 
+                <ul class="uk-switcher uk-margin">
+                    {%for dat in datos%}
+                    {%for f in files%}
+                    {%if f.replace('.geojson', '') == dat[0].loteo %}
+                    <li>
+                        <div uk-grid>
+                            <div class="uk-width-auto">
+                                <table id="tabla-{{dat[0].loteo}}" class="uk-table uk-table-small uk-table-divider">
+                                    <thead>
+                                        <tr class="uk-text-small uk-margin-small">
+                                            <th>Lote</th>
+                                            <th>Estado</th>
+                                            <!--   <th>Vendedor</th> -->
+                                            <th>Fecha</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {%for d in dat%}
+                                        <tr class="uk-text-small uk-margin-small">
+                                            <td>{{d.nombrecompleto}}</td>
+                                            <td>{{d.estado}}</td>
+                                            <!-- <td>{{d.usuario}}</td> -->
+                                            <td>{{d.fecha}}</td>
+                                        </tr>
+                                        {%endfor%}
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="uk-width-expand">
+                                <h4 class="uk-text-small@s"> <span class="uk-text-background"> Estado del proyecto:
+                                    </span></h4>
+                                {%for g in graphs%}
+                                {%if g.name.replace('.geojson', '') == dat[0].loteo%}
+                                {{ g.graph | safe}}
+                                {%endif%}
+                                {%endfor%}
+                            </div>
+                        </div>
                     </li>
                     {%endif%}
                     {%endfor%}
                     {%endfor%}
                 </ul>
             </div>
-        </div>
-        <div class="uk-width-expand" style="height:500px; padding-left:1rem;">
-            <div id="mapLot" style="height: 500px; width: 100%;"></div>
-        </div>
-    </div>
-    <hr class="uk-divider-icon">
-    <div>
-        <h4 class="uk-text-small@s"> <span class="uk-text-background"> Últimos movimientos: </span></h4>
-        <ul uk-tab>
-            {%for dat in datos%}
-            {%for f in files%}
-            {%if f.replace('.geojson', '') == dat[0].loteo %}
-            <li>
-                <a href="#">
-                    <h6 class="uk-text-small"> {{ dat[0].loteo }} </h6>
-                </a>
-            </li>
-            {%endif%}
-            {%endfor%}
-            {%endfor%}
-        </ul>
-
-        <ul class="uk-switcher uk-margin">
-            {%for dat in datos%}
-            {%for f in files%}
-            {%if f.replace('.geojson', '') == dat[0].loteo %}
-            <li>
-                <div uk-grid>
-                    <div class="uk-width-auto">
-                        <table id="tabla-{{dat[0].loteo}}" class="uk-table uk-table-small uk-table-divider">
-                            <thead>
-                                <tr class="uk-text-small uk-margin-small">
-                                    <th>Lote</th>
-                                    <th>Estado</th>
-                                    <th>Vendedor</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {%for d in dat%}
-                                <tr class="uk-text-small uk-margin-small">
-                                    <td>{{d.nombrecompleto}}</td>
-                                    <td>{{d.estado}}</td>
-                                    <td>VENDEDOR</td>
-                                </tr>
-                                {%endfor%}
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="uk-width-expand">
-                        <h4 class="uk-text-small@s"> <span class="uk-text-background"> Estado del proyecto: </span></h4>
-                        {%for g in graphs%}
-                        {%if g.name.replace('.geojson', '') == dat[0].loteo%}
-                        {{ g.graph | safe}}
-                        {%endif%}
-                        {%endfor%}
-                    </div>
-                </div>
-            </li>
-            {%endif%}
-            {%endfor%}
-            {%endfor%}
-        </ul>
-    </div>
+        </li>
+    </ul>
 </div>
-
+<script src="https://unpkg.com/leaflet-simple-map-screenshoter"></script>
 <script>
+
     var fileNames = {{ files | tojson | safe }};
 
     var mapLot = L.map("mapLot", {
         maxZoom: 18,
+        zoomSnap: 0.1,
     }).setView([-42.9095, -71.3143], 14);
 
     var Esri_WorldImagery = L.tileLayer(
@@ -124,6 +143,11 @@
 
     Esri_WorldImagery.addTo(mapLot);
 
+    let pluginOptions = {
+        position: 'topright',
+        screenName: 'estado_proyecto',
+    };
+    this.simpleMapScreenshoter = L.simpleMapScreenshoter(pluginOptions).addTo(this.mapLot)
     // Function to fetch and add GEOJSON files to the Leaflet map
     async function fetchAndAddGeojsonToMap() {
         try {
@@ -248,10 +272,11 @@
             '<div class="uk-form-controls"><input class="uk-input uk-disabled" type="text" name="parcela" value="' +
             props.nombrecompleto +
             '"></div></br>' +
-            '<div class="uk-form-controls"><input class="uk-input" type="text" id="comprador" placeholder="Comprador(es)"></div></br>' +
-            '<div class="uk-form-controls" hidden><input class="uk-input" type="date" id="fechareserva"/> </div>' +
+
+            '<div class="uk-form-controls"><label class="uk-form-label" for="form-stacked-text">Comprador(es)</label>' +
+            '<input class="uk-input" type="text" name="comprador" placeholder="APELLIDO Nombre(s)" ></div></br>' +
             '<div class="uk-margin">' +
-            '<select id="estado" class="uk-select" aria-label="Select" name="estado">' +
+            '<select id="estado" class="uk-select" aria-label="Select" name="estado" required>' +
             options +
             "</select>" +
             "</div>" +
@@ -265,6 +290,7 @@
         );
         setDateToday();
     };
+
     function setDateToday() {
         // Obtener la fecha de hoy
         var today = new Date();
@@ -291,6 +317,17 @@
                 message:
                     "<span uk-icon='icon: check'></span> Datos guardados correctamente.",
                 status: "success",
+                timeout: 1200,
+            });
+            // Hacer clic en el botón automáticamente
+            document.getElementById(loteo).click();
+        }
+
+        if (clickloteo === "False") {
+            UIkit.notification({
+                message:
+                    "<ion-icon name='ban-outline'></ion-icon> Error, lote vendido por otro usuario.",
+                status: "danger",
                 timeout: 1200,
             });
             // Hacer clic en el botón automáticamente
