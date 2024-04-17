@@ -1,4 +1,4 @@
-{% extends "base.html" %} {% block title %}Cuotas SAOS{% endblock %}
+{% extends "base.html" %} {% block title %}Cobranzas SAOS{% endblock %}
 
 {% block main_content %}
 
@@ -57,41 +57,107 @@
         {%endif%}
     </div>
     <div style="padding-left: 0.5rem; width:75%;">
-        <table id="tabla-cuotas" class="uk-table uk-table-small uk-table-divider">
-            <thead>
-                <tr>
-                    <th>Usuario</th>
-                    <th>Cliente</th>
-                    <th>Valor cuota</th>
-                    <th>Proyecto</th>
-                    <th>Lote</th>
-                    <th>Fecha inicio</th>
-                    <th>Cuotas totales</th>
-                    <th>Número de cuota</th>
-                    <th>Fecha a pagar</th>
-                    <th>Estado del pago</th>
-                </tr>
-            </thead>
-            <tbody>
-                {%if cuotas_usuario != ''%}
-                {%for cuota in cuotas_usuario %}
-                <tr>
-                    <td>{{ cuota.user.nombre + ' ' + cuota.user.apellido }}</td>
-                    <td>{{cuota.cliente}}</td>
-                    <td>{{cuota.cuotadolar}}</td>
-                    <td>{{cuota.proyecto}}</td>
-                    <td>{{cuota.lote}}</td>
-                    <td>{{ cuota.fecha }}</td>
-                    <td>{{cuota.numcuotas}}</td>
-                    <td>{{cuota.idcuota}}</td>
-                    <td>{{cuota.fechacuota}}</td>
-                    <td>{{cuota.estadocuota}}</td>
-                </tr>
-                {%endfor%}
-                {%endif%}
-            </tbody>
-        </table>
+        <ul uk-tab>
+            <li class="uk-active"><a href="">Proyectos Cobranzas</a></li>
+            <li><a href="">Tabla Cobranzas</a></li>
+        </ul>
+        <ul class="uk-switcher uk-margin">
+            <li>
+                <div uk-grid>
+                    <div class="uk-width-auto">
+                        <div>
+                            <form action="add_cobranza" method="POST">
+                                <fieldset class="uk-fieldset">
+                                    <legend class="uk-legend uk-text-medium">Nuevo proyecto:</legend>
+                                    <br>
+                                    <div class="uk-form-controls">
+                                        <div class="uk-margin">
+                                            <div class="uk-form-controls">
+                                                <label class="uk-form-label" for="form-stacked-text">Nombre</label>
+                                                <input type="text" class="uk-input" name="cliente"
+                                                    placeholder="e.g., Miraflores">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <button type="submit"
+                                        class="uk-button uk-button-secondary .uk-width-1-1">Agregar</button>
+                                </fieldset>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="uk-width-expand">
+                        {%if cobranzas%}
+                        {%else%}
+                        <p class="uk-text-warning">Actualmente no hay proyectos de cobranzas.</p>
+                        {%endif%}
+
+                        <table id="tabla-cobranzas" class="uk-table uk-table-small uk-table-divider">
+                            <thead>
+                                <tr>
+                                    <th>id</th>
+                                    <th>Proyecto</th>
+                                    <th>Fecha creación</th>
+                                    <th>Creado por</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for cobranza in cobranzas%}
+                                <tr class="uk-margin-small uk-text-small">
+                                    <td>{{cobranza.id}}</td>
+                                    <td>{{cobranza.proyecto}}</td>
+                                    <td>{{cobranza.fecha}}</td>
+                                    <td>{{cobranza.user}}</td>
+                                </tr>
+                                {%endfor%}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </li>
+
+            <li>
+                <table id="tabla-cuotas" class="uk-table uk-table-small uk-table-divider">
+                    <thead>
+                        <tr>
+                            <th>Usuario</th>
+                            <th>Cliente</th>
+                            <th>Valor cuota</th>
+                            <th>Proyecto</th>
+                            <th>Lote</th>
+                            <th>Fecha inicio</th>
+                            <th>Cuotas totales</th>
+                            <th>Número de cuota</th>
+                            <th>Fecha a pagar</th>
+                            <th>Estado del pago</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {%if cuotas_usuario != ''%}
+                        {%for cuota in cuotas_usuario %}
+                        <tr class="uk-margin-small uk-text-small">
+                            <td>{{ cuota.user.nombre + ' ' + cuota.user.apellido }}</td>
+                            <td>{{cuota.cliente}}</td>
+                            <td>{{cuota.cuotadolar}}</td>
+                            <td>{{cuota.proyecto}}</td>
+                            <td>{{cuota.lote}}</td>
+                            <td>{{ cuota.fecha }}</td>
+                            <td>{{cuota.numcuotas}}</td>
+                            <td>{{cuota.idcuota}}</td>
+                            <td>{{cuota.fechacuota}}</td>
+                            <td>{{cuota.estadocuota}}</td>
+                        </tr>
+                        {%endfor%}
+                        {%endif%}
+                    </tbody>
+                </table>
+            </li>
+        </ul>
     </div>
+</div>
+
+
+
+</div>
 </div>
 
 <script>

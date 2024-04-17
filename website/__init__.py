@@ -4,27 +4,28 @@ import os
 from flask_login import login_manager, LoginManager
 from werkzeug.security import generate_password_hash
 
-db = SQLAlchemy()
-# DB_NAME = "mysql+mysqlconnector://{username}:{password}@{hostname}/{databasename}".format(
-    # username="baltazargch",
-    # password="rhapsody-999",
-    # hostname="baltazargch.mysql.pythonanywhere-services.com",
-    # databasename="baltazargch$saosdata",
-    # )
+type = 'testing'
 
-# def create_app():
-#     app = Flask(__name__)
-#     app.config['SECRET_KEY'] = 'asdasdasdasdsaos12341025715'
-#     # Databse inside app
-#     app.config['SQLALCHEMY_DATABASE_URI'] = DB_NAME
-    
-DB_NAME = 'database.db'
+db = SQLAlchemy()
+
+if type == 'testing':
+    DB_NAME = 'database.db'
+elif type=='production':
+    DB_NAME = "mysql+mysqlconnector://{username}:{password}@{hostname}/{databasename}".format(
+    username="baltazargch",
+    password="rhapsody-999",
+    hostname="baltazargch.mysql.pythonanywhere-services.com",
+    databasename="baltazargch$saosdata",
+    )
 
 def create_app():
     app = Flask(__name__)
     app.config['SECRET_KEY'] = 'asdasdasdasdsaos12341025715'
     # Databse inside app  
-    app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{DB_NAME}'
+    if type == 'testing':
+        app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{DB_NAME}'
+    elif type == 'production':
+        app.config['SQLALCHEMY_DATABASE_URI'] = DB_NAME
     
     db.init_app(app)
 
@@ -39,21 +40,22 @@ def create_app():
     
     from .models import User
 
-    with app.app_context():
-        db.create_all()
-        
-        # Check if the admin user already exists
-        admin_user = User.query.filter_by(email='saos@saos.com').first()
-        
-        if not admin_user:
-            new_user = User(email='saos@saos.com',
-                        nombre='saos',
-                        apellido='saos',
-                        tipo="admin",
-                        password = generate_password_hash('1234',  method='pbkdf2')) # type: ignore
+    if type == 'testing':
+        with app.app_context():
+            db.create_all()
             
-            db.session.add(new_user)
-            db.session.commit()
+            # Check if the admin user already exists
+            admin_user = User.query.filter_by(email='saos@saos.com').first()
+            
+            if not admin_user:
+                new_user = User(email='saos@saos.com',
+                            nombre='saos',
+                            apellido='saos',
+                            tipo="admin",
+                            password = generate_password_hash('1234',  method='pbkdf2')) # type: ignore
+                
+                db.session.add(new_user)
+                db.session.commit()
     
     login_manager = LoginManager()
     login_manager.login_view = 'auth.login' #type: ignore

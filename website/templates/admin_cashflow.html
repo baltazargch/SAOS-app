@@ -1,0 +1,82 @@
+{% extends "base.html" %} {% block title %}Cuotas SAOS{% endblock %}
+
+{% block main_content %}
+<div style="padding-top:1rem; width: 85%;margin: auto;">
+    <div uk-grid>
+        <div class="uk-widht-1-6">
+            <div style="border-right: 1px solid rgba(0,0,0,0.2); padding-right:1rem;">
+                <form action="new_cashflow" method='POST'>
+                    <fieldset class="uk-fieldset">
+                        <legend class="uk-legend">Nuevo cliente Cash Flow:</legend>
+                        <div class="uk-form-controls">
+                            <label class="uk-form-label" for="form-stacked-text">Nombre(s)</label>
+                            <input type="text" class="uk-input uk-form-small" name="nombre"
+                                placeholder="Ingrese nombre(s)">
+                        </div>
+
+                        <div class="uk-form-controls">
+                            <label class="uk-form-label" for="form-stacked-text">Apellido(s)</label>
+                            <input type="text" class="uk-input uk-form-small" name="apellido"
+                                placeholder="Ingrese apellido(s)">
+                        </div>
+
+                        <div class="uk-form-controls">
+                            <label class="uk-form-label" for="form-stacked-text">Email</label>
+                            <input type="email" class="uk-input uk-form-small" name="email"
+                                placeholder="Ingrese correo electrónico">
+                        </div>
+                        <br>
+
+                        <div class="uk-form-controls">
+                            <label class="uk-form-label" for="form-stacked-text">Contraseña</label>
+                            <input type="password" class="uk-input uk-form-small" name="password1"
+                                placeholder="Ingrese contraseña segura">
+                        </div>
+
+                        <div class="uk-form-controls">
+                            <label class="uk-form-label" for="form-stacked-text">Confirmar contraseña</label>
+                            <input type="password" class="uk-input uk-form-small" name="password2"
+                                placeholder="Repita contraseña segura">
+                        </div>
+                        <br />
+                    </fieldset>
+                    <button type="submit" class="uk-button uk-button-secondary uk-width-1-1">Agregar cliente
+                    </button>
+                </form>
+            </div>
+        </div>
+        <div class="uk-widht-5-6">
+            <div uk-nav>
+                <div></div>
+
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+
+    // Función para ocultar todos los paneles al cargar la página
+    window.onload = function () {
+        // Ocultar todos los paneles
+        var panels = document.querySelectorAll('#cuotas-content > div');
+        panels.forEach(function (panel) {
+            panel.style.display = 'none';
+        });
+    };
+
+    function showPanel(panelId) {
+        // Ocultar todos los paneles
+        var panels = document.querySelectorAll('#cuotas-content > div');
+        panels.forEach(function (panel) {
+            panel.style.display = 'none';
+        });
+
+        // Mostrar el panel deseado
+        var panelToShow = document.getElementById(panelId);
+        if (panelToShow) {
+            panelToShow.style.display = 'block';
+        }
+    };
+
+</script>
+{%endblock%}

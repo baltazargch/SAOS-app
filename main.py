@@ -3,15 +3,9 @@ from flask import Flask, jsonify, request, redirect, url_for
 from flask_login import current_user
 import os
 import json
+from website import type
 
 app = create_app()
-
-@app.route('/get_files')
-def get_files():
-    # Obtener la lista de nombres de archivos en la carpeta static/maps
-    files = str(app.static_folder) + '\\maps'
-    files = os.listdir(files)
-    return jsonify(files)
 
 @app.route('/modify_map', methods=['POST']) # type: ignore
 def modify_map():  
@@ -25,7 +19,7 @@ def modify_map():
         # Determinar qué archivo GeoJSON leer según la información del modal
         nombre_archivo = loteo + '.geojson'  # type: ignore
         ruta_archivo = os.path.join(app.static_folder, 'maps', nombre_archivo) # type: ignore
-
+        
          # Leer el contenido del archivo GeoJSON
         with open(ruta_archivo, 'r') as f:
             contenido_geojson = json.load(f)
@@ -45,4 +39,8 @@ def modify_map():
     return redirect(url_for('views.maps_users', loteo=loteo, clickloteo=True))
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    if type =='testing':
+        app.run(debug=True)
+    elif type == 'production':
+        app.run()
+        

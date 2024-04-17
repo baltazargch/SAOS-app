@@ -12,6 +12,8 @@ class User(db.Model, UserMixin):
     tipo = db.Column(db.String(250))
     fecha = db.Column(db.DateTime(timezone=True), default=func.now())
     cuotas = db.relationship('Cuotas', back_populates='user', lazy=True, cascade="all, delete-orphan")
+    cashflow = db.relationship('Cashflow', back_populates='user', lazy=True, cascade="all, delete-orphan")
+    cobranza = db.relationship('Cobranza', back_populates='user', lazy=True, cascade="all, delete-orphan")
     permits = db.relationship('Permit', back_populates='user', lazy=True, cascade="all, delete-orphan")
     
 class Permit(db.Model):
@@ -47,3 +49,25 @@ class Cuotas(db.Model):
         CheckConstraint(estadocuota.in_(['Pagado', 'Pendiente', 'Vencido']), name='estadocuota_valido'),
     )
     
+class Cashflow(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    fecha = db.Column(db.DateTime(timezone=True), default=func.now())
+    cliente = db.Column(db.String(250))
+    clienteid = db.Column(db.String(250))
+    proyecto = db.Column(db.String(250))
+    idmov = db.Column(db.Integer)
+    movdolar = db.Column(db.Integer)
+    movpesos = db.Column(db.Integer)
+    fechamov = db.Column(Date)
+    razonsocial = db.Column(db.String(250))
+    responsable = db.Column(db.String(250))
+    notas = db.Column(db.String(250))
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    user = db.relationship('User', back_populates='cashflow')
+
+class Cobranza(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    fecha = db.Column(db.DateTime(timezone=True), default=func.now())
+    proyecto = db.Column(db.String(250))
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    user = db.relationship('User', back_populates='cobranza')

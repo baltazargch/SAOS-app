@@ -13,6 +13,13 @@ auth = Blueprint('auth', __name__)
 
 @auth.route('/', methods=['GET', 'POST'])
 def login():
+    
+    if current_user.is_authenticated:
+        if current_user.tipo == 'admin':
+            return redirect(url_for('views.admindashboard'))
+        else:
+            return redirect(url_for('views.dashboard'))
+            
     if request.method == 'POST':
         email = request.form.get('email')
         password = request.form.get('password')
@@ -30,7 +37,7 @@ def login():
                 flash('Contraseña incorrecta. Intente de nuevo.', category='error')
         else: 
             flash('El email ingresado no se encuentra registrado.', category='error')
-           
+     
     return render_template('home.html', user=current_user)
 
 @auth.route('/logout')
@@ -187,3 +194,4 @@ def edit_permits():
             db.session.commit()
             flash("Permisos cambiados correctamente!",  category="success")
     return redirect('/sing_up?tab=permisos')
+

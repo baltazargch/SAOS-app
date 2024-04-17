@@ -71,8 +71,8 @@
             </div>
             <div style="width: 65%; text-align:right; font-size:12px;">
                 <p>Soluciones empresariales, gestión de cobranzas y administración de negocios.</p>
-                <p>Contacto: email: <a href="#" type="mail">saos@saos.com</a>; Tel. +54 2945 00 0000.</p>
-                <p>Dirección: Av. Alvear 855, Esquel.</p>
+                <p>Contacto: email: <a href="#" type="mail">info@saos.app</a>; Tel. +54 2945 553029</p>
+                <p>Dirección: Av. Alvear 1234, Esquel (Chubut).</p>
             </div>
         </div>
     </div>
@@ -81,7 +81,7 @@
         <br>
         <div style="padding: 0.5rem; border:1px dashed black; ">
             <div style="display: flex; justify-content:space-between; align-items:center;">
-                <h4>Resumen de cuenta</h4>
+                <h4>RECIBO</h4>
                 <div style="font-size:13px;">
                     <p><b>Fecha de impresión: {{ today }}</b></p>
                 </div>
@@ -112,37 +112,47 @@
         </div>
 
         <!-- detalle de cuota anterior, actual y siguiente -->
-        <br>
-        <div style="padding: 0.5rem; border:1px dashed black; ">
-            <h4>Últimas cuotas</h4>
+        <!-- <br> -->
+        <div style="padding: 0.5rem; border:1px dashed black; margin-top:0.3rem; ">
+            <h4>Pago actual:</h4>
             <hr>
-            <div style="display: flex; justify-content:space-between; font-size:13px;">
+            <div style="display: flex; justify-content:space-evenly; font-size:13px;">
                 {%for dat in dataCliente%}
                 <div>
                     {%if dat.ultima_cuota_pagada %}
-                    <p><b>Fecha cuota anterior: </b>{{dat.ultima_cuota_pagada.fechacuota}}</p>
-                    <p><b>Monto pagado: </b>{{dat.ultima_cuota_pagada.cuotapagadadolar}} USD</p>
+                    <h5 class="uk-margin-small"><b>Fecha de pago: </b>{{dat.ultima_cuota_pagada.fechacuota}}</h5>
+                    <h5 class="uk-margin-small"><b>Monto: </b>{{dat.ultima_cuota_pagada.cuotapagadadolar}} USD
+                    </h5>
                     {%endif%}
                 </div>
                 {%endfor%}
                 {%for dat in dataCliente%}
+                {%if dat.siguiente_cuota_pagar%}
                 <div>
-                    <p><b>Fecha cuota actual: </b>{{dat.siguiente_cuota_pagar.fechacuota}}</p>
-                    <p><b>Monto pagado: </b>{{dat.siguiente_cuota_pagar.cuotadolar}} USD</p>
+                    <h5 class="uk-margin-small"><b>Siguiente pago: </b>{{dat.siguiente_cuota_pagar.fechacuota}}</h5>
+                    <h5 class="uk-margin-small"><b>Valor de cuota: </b>{{dat.siguiente_cuota_pagar.cuotadolar}} USD
+                    </h5>
                 </div>
-                <div>
-                    {%if dat.cuota_posterior%}
-                    <p><b>Fecha cuota siguiente: </b>{{ dat.cuota_posterior.fechacuota}}</p>
-                    <p><b>Monto a pagar: </b>{{ dat.cuota_posterior.cuotadolar}} USD</p>
-                    {%endif%}
-                </div>
+                {%endif%}
                 {%endfor%}
             </div>
         </div>
-        <br>
+
+        <!-- Firmas -->
+        <div style="padding: 0.5rem; border:1px dashed black;font-size:13px;margin-top:0.3rem;">
+            <div style="margin: auto; width:50%;">
+                <p><b>Recibido por:</b></p><br><br>
+                <div style="border-bottom: 1px solid black; width: 100%;"></div>
+                <p class="uk-text-small uk-margin-small"><b>Firma y aclaración</b></p>
+
+            </div>
+        </div>
+
+        <br><br>
+
         <div style="padding: 0.5rem; border:1px dashed black; ">
             <div style="display: flex; justify-content:space-between; align-items:center;">
-                <h4>Resumen de cuenta</h4>
+                <h4>RECIBO</h4>
                 <div style="font-size:13px;">
                     <p><b>Fecha de impresión: {{ today }}</b></p>
                 </div>
@@ -173,33 +183,33 @@
         </div>
 
         <!-- detalle de cuota anterior, actual y siguiente -->
-        <br>
-        <div style="padding: 0.5rem; border:1px dashed black; ">
-            <h4>Últimas cuotas</h4>
+        <!--  <br> -->
+        <div style="padding: 0.5rem; border:1px dashed black; margin-top:0.3rem; ">
+            <h4>Pago actual:</h4>
             <hr>
-            <div style="display: flex; justify-content:space-between; font-size:13px;">
+            <div style="display: flex; justify-content:space-evenly; font-size:13px;">
                 {%for dat in dataCliente%}
                 <div>
                     {%if dat.ultima_cuota_pagada %}
-                    <p><b>Fecha cuota anterior: </b>{{dat.ultima_cuota_pagada.fechacuota}}</p>
-                    <p><b>Monto pagado: </b>{{dat.ultima_cuota_pagada.cuotapagadadolar}} USD</p>
+                    <h5 class="uk-margin-small"><b>Fecha de pago: </b>{{dat.ultima_cuota_pagada.fechacuota}}</h5>
+                    <h5 class="uk-margin-small"><b>Monto: </b>{{dat.ultima_cuota_pagada.cuotapagadadolar}} USD
+                    </h5>
                     {%endif%}
                 </div>
                 {%endfor%}
                 {%for dat in dataCliente%}
+                {%if dat.siguiente_cuota_pagar%}
                 <div>
-                    <p><b>Fecha cuota actual: </b>{{dat.siguiente_cuota_pagar.fechacuota}}</p>
-                    <p><b>Monto pagado: </b>{{dat.siguiente_cuota_pagar.cuotadolar}} USD</p>
+                    <h5 class="uk-margin-small"><b>Siguiente pago: </b>{{dat.siguiente_cuota_pagar.fechacuota}}</h5>
+                    <h5 class="uk-margin-small"><b>Valor de cuota: </b>{{dat.siguiente_cuota_pagar.cuotadolar}} USD
+                    </h5>
                 </div>
-                <div>
-                    {%if dat.cuota_posterior%}
-                    <p><b>Fecha cuota siguiente: </b>{{ dat.cuota_posterior.fechacuota}}</p>
-                    <p><b>Monto a pagar: </b>{{ dat.cuota_posterior.cuotadolar}} USD</p>
-                    {%endif%}
-                </div>
+                {%endif%}
                 {%endfor%}
             </div>
         </div>
+
+
     </div>
     <!-- Agregar la biblioteca JavaScript de Plotly -->
     <script src="https://cdn.plot.ly/plotly-2.5.1.min.js"></script>

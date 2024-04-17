@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, make_response, request, redirect
 from flask_login import login_required, current_user
 from .utils import tipo_usuario_aceptado, ultimas_cuotas
-from .models import Permit, User, Cuotas
+from .models import Permit, User, Cuotas, Cobranza
 from . import db
 from sqlalchemy import func
 from datetime import datetime
@@ -100,8 +100,13 @@ def admincuotas():
         
         for cuota in cuotas_usuarios_loteos:
             cuota.fecha = cuota.fecha.date()
+            
+        cobranzas = Cobranza.query.all()
+        if not cobranzas:
+            cobranzas = []
         
-    return render_template('admin_cuotas.html', user=current_user, usuarios_loteos=usuarios_loteos, cuotas_usuario=cuotas_usuarios_loteos)
+    return render_template('admin_cuotas.html', user=current_user, usuarios_loteos=usuarios_loteos, 
+                           cuotas_usuario=cuotas_usuarios_loteos, cobranzas=cobranzas)
 
 @views.route('/admin_descargas', methods=['GET'])
 @login_required
@@ -341,3 +346,15 @@ def imprimir_pago(id):
     
     return render_template('imprimir_pago.html', cliente=cuotas_cliente, grafica=grafica, 
                            dataCliente = resultados, today=today, icliente=icliente)
+    
+@views.route('/cashflow', methods=['GET', 'POST'])
+@login_required
+@tipo_usuario_aceptado('admin')
+def admin_cashflow():
+    cashflow = Cuotas.query.all()
+    if not cashflow: 
+        cashflow = []
+    usuarios = User.query.filter_by(tipo='user')
+    if not usuarios: 
+        usuarios = []
+    return render_template('admin_cashflow.html', user=current_user, cashflow=cashflow, usuarios=usuarios)

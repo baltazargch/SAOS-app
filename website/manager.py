@@ -91,3 +91,4 @@ def set_maps_permits(id):
         userDb.mappermits = maps_json #type: ignore
         db.session.commit()
     return redirect('/sing_up?tab=mappermits')
+
