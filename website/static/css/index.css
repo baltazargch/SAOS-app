@@ -21,6 +21,17 @@
   display: flex;
 }
 
+#background-video {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -2;
+  object-fit: fill;
+  filter: hue-rotate(180deg) saturate(100%) brightness(120%) contrast(0.9);
+}
+
 .wrapper {
   display: flex;
   justify-content: center;
@@ -30,8 +41,8 @@
   background-position: center;
   background-size: contain;
   z-index: 0;
-  background-image: url("mapa-de-trabajo.svg");
 }
+
 .wrapper .form-box {
   position: relative;
   width: 100%;
@@ -46,7 +57,7 @@
 }
 .wrapper .form-box-singup {
   position: relative;
-  width: 500px;
+  width: 400px;
   height: 350px;
   border: 2px solid rgba(255, 255, 255, 0.5);
   border-radius: 20px;
@@ -55,7 +66,7 @@
   justify-content: center;
   align-items: center;
   top: -100px;
-  background: #303330ac; /* fallback for old browsers */
+  background: transparent; /* fallback for old browsers */
 }
 .wrapper h2 {
   font-size: 2em;
