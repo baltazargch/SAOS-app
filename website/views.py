@@ -11,6 +11,7 @@ import os
 import geojson
 import json
 from shapely import geometry, from_geojson
+from . import type
 
 # Estas son las vistas de la app general. 
 views = Blueprint('views', __name__)
@@ -40,7 +41,11 @@ def maps_users():
     datos = []
     graphs = []
     for archivo in files:
-        with open(f'{mapdir}\\{archivo}') as f:
+        if type == 'testing':
+            ruta= f'{mapdir}\\{archivo}'
+        else:
+            ruta= f'{mapdir}/{archivo}'
+        with open(ruta) as f:
             data = geojson.load(f)
             geometria = from_geojson(geojson.dumps(data)) 
             centroides.append({"name": archivo, "coords": geometria.centroid.coords[:][0]})
@@ -64,15 +69,14 @@ def maps_users():
                                                 values=[disp, rese, vend])]).update_traces(hole=0.4), full_html=False)
             })
             
+            # Seleccionar las primeras 10 características con fecha ordenadas
             feat_with_date = [fe for fe in feat if fe['properties'].get('fecha') is not None]
-            
-            # Ordenar las características por fecha de forma descendente
-            feat_ordenadas = sorted(feat_with_date, key=obtener_fecha, reverse=True)
+            feat_ordenadas = sorted(feat_with_date, key=obtener_fecha, reverse=True)[:10]
 
-            # Seleccionar las primeras 10 características después de ordenar
-            datos.append(
-                [fe['properties'] for fe in feat_ordenadas[:10]]
-            )
+            # Agregar características ordenadas al diccionario de datos
+            datos.append({
+                archivo.replace('.geojson', ''): [fe.get('properties', {}) for fe in feat_ordenadas]
+            })
             
     return render_template("map_users.html", user=current_user, files=files, centroides=centroides, 
                            estados=estados, datos=datos, graphs=graphs)

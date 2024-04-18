@@ -63,41 +63,39 @@
                     <span class="uk-text-background"><b> Últimos movimientos: </b></span>
                 </h3>
                 <ul uk-tab>
-                    {%for dat in datos%}
-                    {%for f in files%}
-                    {%if f.replace('.geojson', '') == dat[0].loteo %}
+                    {% for dat in datos %}
+                    {% for key, value in dat.items() %}
+                    {% set nombre = key %}
                     <li>
                         <a href="#">
-                            <h6 class="uk-text-small"> {{ dat[0].loteo }} </h6>
+                            <h6 class="uk-text-small"> {{ nombre }} </h6>
                         </a>
                     </li>
-                    {%endif%}
                     {%endfor%}
                     {%endfor%}
                 </ul>
-
                 <ul class="uk-switcher uk-margin">
-                    {%for dat in datos%}
-                    {%for f in files%}
-                    {%if f.replace('.geojson', '') == dat[0].loteo %}
+                    {% for dat in datos %}
+                    {% for key, value in dat.items() %}
+                    {% set nombre = key %}
                     <li>
                         <div uk-grid>
                             <div class="uk-width-auto">
-                                <table id="tabla-{{dat[0].loteo}}" class="uk-table uk-table-small uk-table-divider">
+                                <table id="tabla-{{nombre}}" class="uk-table uk-table-small uk-table-divider">
                                     <thead>
                                         <tr class="uk-text-small uk-margin-small">
                                             <th>Lote</th>
                                             <th>Estado</th>
-                                            <!--   <th>Vendedor</th> -->
+
                                             <th>Fecha</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {%for d in dat%}
+                                        {%for d in value%}
                                         <tr class="uk-text-small uk-margin-small">
                                             <td>{{d.nombrecompleto}}</td>
                                             <td>{{d.estado}}</td>
-                                            <!-- <td>{{d.usuario}}</td> -->
+
                                             <td>{{d.fecha}}</td>
                                         </tr>
                                         {%endfor%}
@@ -108,14 +106,13 @@
                                 <h4 class="uk-text-small@s"> <span class="uk-text-background"> Estado del proyecto:
                                     </span></h4>
                                 {%for g in graphs%}
-                                {%if g.name.replace('.geojson', '') == dat[0].loteo%}
+                                {%if g.name.replace('.geojson', '') == nombre%}
                                 {{ g.graph | safe}}
                                 {%endif%}
                                 {%endfor%}
                             </div>
                         </div>
                     </li>
-                    {%endif%}
                     {%endfor%}
                     {%endfor%}
                 </ul>
