@@ -28,7 +28,7 @@ class Permit(db.Model):
     
 class Cuotas(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    fecha = db.Column(db.DateTime(timezone=True), default=func.now())
+    fecha = db.Column(db.DateTime(timezone=False), default=func.now())
     cliente = db.Column(db.String(250))
     clienteid = db.Column(db.String(250))
     proyecto = db.Column(db.String(250))

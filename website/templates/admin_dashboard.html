@@ -9,11 +9,11 @@
     <div class="uk-text-background uk-text-default">
         Su rol actual es {{ current_user.tipo.upper() }}: A continuación, encontrarás las acciones disponbiles.
     </div>
-    <hr>
-    <br>
-    <div>
-        <div class="uk-child-width-1-1@s uk-child-width-1-3@m uk-text-center admin__dash" uk-grid="masonry: pack"
-            style="font-size: smaller;">
+    <hr class="uk-divider-icon">
+    <div class="uk-container uk-container-small uk-position-relative uk-text-small uk-margin-small uk-padding-small">
+        <h4 class="uk-heading-line"><span>Usuarios y Permisos</span></h4>
+        <p class="'uk-text-justify"> Acceda y administre los diferentes usuarios y permisos de SAOS.</p>
+        <div class="uk-child-width-auto uk-text-center admin__dash" uk-grid="masonry: pack" style="font-size: smaller;">
             <div>
                 <a href="/sing_up">
                     <div class="uk-card uk-card-hover uk-margin-small">
@@ -28,6 +28,10 @@
                     </div>
                 </a>
             </div>
+        </div>
+        <h4 class="uk-heading-line"><span>Cobranzas y Pagos</span></h4>
+        <p class="'uk-text-justify"> Genere nuevos planes de cobranza y registre pagos de los clientes activos.</p>
+        <div class="uk-child-width-auto uk-text-center admin__dash" uk-grid="masonry: pack" style="font-size: smaller;">
             <div>
                 <a href="/admincuotas">
                     <div class="uk-card uk-card-hover uk-margin-small">
@@ -43,6 +47,25 @@
                 </a>
             </div>
             <div>
+                <a href="/admin_pagos">
+                    <div class="uk-card uk-card-hover uk-margin-small">
+                        <div class="uk-card-media-top"
+                            style="display: flex; justify-content: center ;align-items: center;">
+                            <ion-icon name="receipt-outline" class="ion-icon-xl"></ion-icon>
+                        </div>
+                        <div class="uk-card-body">
+                            <h3 class="uk-card-title">Registrar pagos</h3>
+                            <p>Agrega un nuevo pago y emite una factura.</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+        <h4 class="uk-heading-line"><span>Cash flow</span></h4>
+        <p class="'uk-text-justify"> Genere nuevos usuarios de Cash Flow y registre movimientos de los clientes activos.
+        </p>
+        <div class="uk-child-width-auto uk-text-center admin__dash" uk-grid="masonry: pack" style="font-size: smaller;">
+            <div>
                 <a href="/cashflow">
                     <div class="uk-card uk-card-hover uk-margin-small">
                         <div class="uk-card-media-top"
@@ -56,6 +79,10 @@
                     </div>
                 </a>
             </div>
+        </div>
+        <h4 class="uk-heading-line"><span>Loteos</span></h4>
+        <p class="'uk-text-justify"> Acceda a los loteos, modifique los estados e impresión de estados generales.</p>
+        <div class="uk-child-width-auto uk-text-center admin__dash" uk-grid="masonry: pack" style="font-size: smaller;">
             <div class="uk-disabled">
                 <a href="#">
                     <div class="uk-card uk-card-hover uk-margin-small">
@@ -70,21 +97,10 @@
                     </div>
                 </a>
             </div>
-            <!-- segunda fila -->
-            <div>
-                <a href="/admin_pagos">
-                    <div class="uk-card uk-card-hover uk-margin-small">
-                        <div class="uk-card-media-top"
-                            style="display: flex; justify-content: center ;align-items: center;">
-                            <ion-icon name="receipt-outline" class="ion-icon-xl"></ion-icon>
-                        </div>
-                        <div class="uk-card-body">
-                            <h3 class="uk-card-title">Registrar pagos</h3>
-                            <p>Agrega un nuevo pago y emite una factura.</p>
-                        </div>
-                    </div>
-                </a>
-            </div>
+        </div>
+        <h4 class="uk-heading-line"><span>Descargas</span></h4>
+        <p class="'uk-text-justify"> Acceda a copias de las bases de datos para cada servicio SAOS.</p>
+        <div class="uk-child-width-auto uk-text-center admin__dash" uk-grid="masonry: pack" style="font-size: smaller;">
             <div>
                 <a href="/admin_descargas">
                     <div class="uk-card uk-card-hover uk-margin-small">
@@ -101,4 +117,5 @@
             </div>
         </div>
     </div>
-    {% endblock %}
+</div>
+{% endblock %}

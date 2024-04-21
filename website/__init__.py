@@ -1,8 +1,8 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
-import os
 from flask_login import login_manager, LoginManager
 from werkzeug.security import generate_password_hash
+from sqlalchemy import select
 
 type = 'testing'
 
@@ -56,6 +56,27 @@ def create_app():
                 
                 db.session.add(new_user)
                 db.session.commit()
+    else: 
+        with app.app_context():
+            try:
+        # run a SELECT 1.   use a core select() so that
+        # the SELECT of a scalar value without a table is
+        # appropriately formatted for the backend
+                db.session.scalar(select(1))
+            except db.exc.DBAPIError as err:
+        # catch SQLAlchemy's DBAPIError, which is a wrapper
+        # for the DBAPI's exception.  It includes a .connection_invalidated
+        # attribute which specifies if this connection is a "disconnect"
+        # condition, which is based on inspection of the original exception
+        # by the dialect in use.
+                if err.connection_invalidated:
+            # run the same SELECT again - the connection will re-validate
+            # itself and establish a new connection.  The disconnect detection
+            # here also causes the whole connection pool to be invalidated
+            # so that all stale connections are discarded.
+                    db.session.scalar(select(1))
+                else:
+                    raise
     
     login_manager = LoginManager()
     login_manager.login_view = 'auth.login' #type: ignore

@@ -8,6 +8,7 @@ from email_validator import validate_email, EmailNotValidError
 import os
 import json
 
+
 # Esta es la vista de login. 
 auth = Blueprint('auth', __name__)
 
@@ -162,6 +163,7 @@ def update_user(id):
             flash('Clave incorrecta.', 'error')
     return redirect('/sing_up')
 
+# Demo para eliminar solamente si tiene la clave para eliminar (not functioning)
 @auth.route('/verificar_clave/<id>', methods=['GET', 'POST'])
 @login_required
 @tipo_usuario_aceptado('admin')

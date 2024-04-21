@@ -8,6 +8,7 @@ from . import db
 from datetime import timedelta, datetime
 from io import StringIO
 import csv
+import calendar
 
 def tipo_usuario_aceptado(tipo):
     def decorator(func):
@@ -34,16 +35,59 @@ def new_user_const(email, password, nombre, apellido, tipo, mapas, loteos, const
 
     return nuevo_usuario
 
-def crear_cuotas_usuario(cliente, proyecto, lote, usuario, num_cuotas, valor_cuota, fecha_inicio):
+# Función para obtener el próximo día 10 del mes
+def proximo_dia_10(fecha, dia):
+    # Obtener el año y mes de la fecha proporcionada
+    año = fecha.year
+    mes = fecha.month
+
+    # Obtener el día 10 del mes siguiente
+    if mes == 12:
+        mes_siguiente = 1
+        año_siguiente = año + 1
+    else:
+        mes_siguiente = mes + 1
+        año_siguiente = año
+
+    # Obtener el día 10 del mes siguiente
+    fecha_siguiente = datetime(año_siguiente, mes_siguiente, dia)
+
+    # Ajustar al siguiente lunes si cae en sábado o domingo
+    dia_semana = fecha_siguiente.weekday()
+    if dia_semana == calendar.SATURDAY:
+        fecha_siguiente += timedelta(days=2)  # Siguiente lunes
+    elif dia_semana == calendar.SUNDAY:
+        fecha_siguiente += timedelta(days=1)  # Siguiente lunes
+
+    return fecha_siguiente
+
+def crear_cuotas_usuario(cliente, proyecto, lote, usuario, 
+                         num_cuotas, valor_cuota, fecha_inicio, pago_ini):
     
     # crear id único
     clienteid = "{}-{}-{}".format(cliente.replace(' ', '-'), proyecto, lote).lower()
+    # Pago inicial (cuota id 0)
+    cuota_ini = Cuotas(
+        cliente=cliente,
+        clienteid = clienteid,
+        proyecto = proyecto,
+        lote = lote, 
+        numcuotas = num_cuotas,
+        idcuota = 0,
+        estadocuota = 'Pagado',
+        cuotadolar = pago_ini,
+        cuotapagadadolar = pago_ini,# Asignar el nombre del cliente (puedes cambiarlo según tus necesidades)
+        fechacuota=fecha_inicio,  # Asignar la fecha de la cuota
+        user=usuario  # Asignar el usuario correspondiente a la cuota
+        ) # type: ignore
+        
+        # Agregar la nueva cuota a la sesión de la base de datos
+    db.session.add(cuota_ini)
     
-    # Calcular la fecha de inicio para la primera cuota
+    # fecha de inicio para la primera cuota
     fecha_cuota = fecha_inicio
     
-    # Calcular el intervalo de tiempo entre cuotas (1 mes)
-    intervalo_cuotas = timedelta(days=31)
+    # iniciar id de cuota
     id_cuota = 1
     # Crear cuotas para el usuario
     for _ in range(num_cuotas):
@@ -65,7 +109,7 @@ def crear_cuotas_usuario(cliente, proyecto, lote, usuario, num_cuotas, valor_cuo
         db.session.add(nueva_cuota)
         
         # Avanzar la fecha de la cuota al próximo mes
-        fecha_cuota += intervalo_cuotas
+        fecha_cuota = proximo_dia_10(fecha_cuota, fecha_inicio.day)
         id_cuota += 1
     
     # Confirmar los cambios en la base de datos

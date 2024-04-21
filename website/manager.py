@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, flash, redirect, url_for, Response, send_file
+from flask import Blueprint, render_template, request, flash, redirect, url_for, Response
 from .models import User, Permit, Cuotas, Cobranza
 from . import db
 from flask_login import login_required, current_user
@@ -6,8 +6,11 @@ from .utils import tipo_usuario_aceptado, crear_cuotas_usuario, generar_csv_cuot
 from datetime import datetime
 import os
 import json
+import plotly.graph_objs as go
+from sqlalchemy import func
 
-# Esta es la vista de login. 
+# Este arhivo contiene todas las funciones que modifican las bases de datos
+# PARA USUARIOS ADMIN
 manager = Blueprint('manager', __name__)
 
 @manager.route('/nuevo_cliente', methods=['POST'])
@@ -25,7 +28,7 @@ def nuevo_cliente():
             cuotas = request.form.get('cuotas')
             fechaini = request.form.get('fechaini')
             valorcuotas = request.form.get('valorcuotas')
-            
+            pago_ini = request.form.get('cuotaini')
             fechaini = datetime.strptime(fechaini, '%Y-%m-%d').date() # type: ignore
         
             clienteid = "{}-{}-{}".format(cliente.replace(' ', '-'), proyecto, lote).lower() #type: ignore
@@ -40,12 +43,16 @@ def nuevo_cliente():
                     usuario=user_to_add, 
                     num_cuotas=int(cuotas), # type: ignore
                     valor_cuota=valorcuotas, 
-                    fecha_inicio=fechaini
+                    fecha_inicio=fechaini, 
+                    pago_ini=pago_ini
                     )
+                flash('Plan de pagos creado exitosamente.', 'success')
             
     return redirect('/admincuotas')
 
 @manager.route('/descargar_csv', methods=['POST'])
+@login_required
+@tipo_usuario_aceptado('admin')
 def descargar_csv_cuotas():
     fecha_actual = datetime.now().strftime('%Y-%m-%d')
     # Generamos el contenido del CSV de las cuotas
@@ -58,6 +65,8 @@ def descargar_csv_cuotas():
     return response
 
 @manager.route('/registrar_pago/<clienteid>/<cuota>', methods=['POST']) #type: ignore
+@login_required
+@tipo_usuario_aceptado('admin')
 def registrar_pago(clienteid, cuota):
     if request.method == 'POST':
         pagado = request.form.get('pagodolares')
@@ -69,6 +78,7 @@ def registrar_pago(clienteid, cuota):
         
         db.session.commit()
         return redirect('/admin_pagos')
+
     
 @manager.route('/set_maps_permits/<id>', methods=['POST'])
 @login_required
@@ -92,7 +102,7 @@ def set_maps_permits(id):
         db.session.commit()
     return redirect('/sing_up?tab=mappermits')
 
-
+# Elimina proyectos de cobranzas (no altera table de cobranzas)
 @manager.route('/delete_cobranza/<string:id>', methods=['POST'])
 @login_required
 @tipo_usuario_aceptado('admin')
@@ -104,7 +114,7 @@ def delete_cobranza(id):
         flash('Proyecto eliminado correctamente.', 'success')
     return redirect('/admincuotas')
 
-
+# Esta función sirve para agregar proyectos de cobranzas y poder asignar plan de cuotas a los usuarios
 @manager.route('/add_cobranza', methods=['POST'])
 @login_required
 @tipo_usuario_aceptado('admin')
@@ -112,7 +122,7 @@ def add_cobranza():
     if request.method == 'POST':
         newproyect = request.form.get('proyect')
         if newproyect:
-            existe = Cuotas.query.filter_by(proyecto=newproyect.upper()).first()
+            existe = Cobranza.query.filter_by(proyecto=newproyect.upper()).first()
             if existe: 
                 flash('El proyecto a crear {}, ya existe'.format(newproyect.upper()), 'error')
             else:
@@ -126,9 +136,77 @@ def add_cobranza():
                 flash('¡Nuevo proyecto creado!', 'sucess')
               
     return redirect('/admincuotas')
+        
+@manager.route('/imprimir_pago/<id>', methods=['GET'])
+@login_required
+@tipo_usuario_aceptado('admin')
+def imprimir_pago(id):
+    cuotas_cliente = Cuotas.query.filter_by(clienteid=id).all()
+    icliente =  Cuotas.query.filter_by(clienteid=id).first()
+    if icliente:
+        cliente = icliente.cliente
+        idcliente = icliente.clienteid
+    # Contar las cuotas pagadas y pendientes
+    cuotas_pagadas = sum(1 for cuota in cuotas_cliente if cuota.estadocuota == 'Pagado') - 1
+    cuotas_pendientes = sum(1 for cuota in cuotas_cliente if cuota.estadocuota == 'Pendiente')
     
+    # Lista para almacenar los resultados
+    resultados = []
+    ultima_cuota_pagada = Cuotas.query.filter(
+        Cuotas.clienteid==idcliente, 
+        Cuotas.estadocuota=='Pagado', 
+        Cuotas.idcuota>0) \
+            .order_by(Cuotas.fechacuota.desc()).first()
+            # Obtener la siguiente cuota a pagar para el cliente actual
+    siguiente_cuota_pagar = Cuotas.query.filter_by(clienteid=idcliente, estadocuota='Pendiente') \
+                                                .order_by(Cuotas.fechacuota).first()
+    
+    cuota_posterior = Cuotas.query.filter(
+        Cuotas.clienteid == idcliente,
+        Cuotas.estadocuota == 'Pendiente',
+        Cuotas.fechacuota > siguiente_cuota_pagar.fechacuota).order_by(Cuotas.fechacuota).first()    #type: ignore 
+                                    
+    # Calcular el total de cuotas y el saldo pendiente
+    total_cuotas_cliente = Cuotas.query.filter_by(clienteid=idcliente).count() - 1
+    
+    saldo_abonado = Cuotas.query.filter(
+        Cuotas.clienteid==idcliente, 
+        Cuotas.estadocuota=='Pagado', 
+        Cuotas.idcuota > 0)\
+            .with_entities(func.sum(Cuotas.cuotapagadadolar)) \
+                .scalar()
+                                                
+    totalDeuda = total_cuotas_cliente * siguiente_cuota_pagar.cuotadolar #type:ignore
+    saldo_pendiente_cliente  = totalDeuda - saldo_abonado   
+    
+    fechas_cuotas = [cuota.fechacuota for cuota in cuotas_cliente]
 
+    # Calcula la fecha máxima y mínima
+    fecha_maxima = max(fechas_cuotas)
+    fecha_minima = min(fechas_cuotas)
+
+    # Agregar los resultados a la lista
+    resultados.append({
+                'cliente': cliente,
+                'ultima_cuota_pagada': ultima_cuota_pagada,
+                'siguiente_cuota_pagar': siguiente_cuota_pagar, 
+                'saldo_pendiente_cliente': saldo_pendiente_cliente,
+                'cuota_posterior':cuota_posterior,
+                'saldo_abonado': saldo_abonado,
+                'totalDeuda':totalDeuda,
+                'fecha_maxima': fecha_maxima,
+                'fecha_minima': fecha_minima, 
+                'total_cuotas': total_cuotas_cliente
+            })
+    today = datetime.now().date()
+    
+    return render_template('imprimir_pago.html', cliente=cuotas_cliente, 
+                           dataCliente = resultados, today=today, icliente=icliente)
+
+# PARA USUARIOS USERS
+# Función para modificar el mapa en cuanto se cambia un estado de lote
 @manager.route('/modify_map', methods=['POST']) # type: ignore
+@login_required
 def modify_map():  
     if request.method == 'POST':
         usuario = current_user.nombre
@@ -180,4 +258,77 @@ def modify_map():
             
     return redirect(url_for('views.maps_users', loteo=loteo, clickloteo=clickloteo))
 
+@manager.route('/imprimir_cobranzas/<id>', methods=['GET'])
+@login_required
+def print_cobranzas(id):
+    cuotas_cliente = Cuotas.query.filter_by(clienteid=id).all()
+    icliente =  Cuotas.query.filter_by(clienteid=id).first()
+    if icliente:
+        cliente = icliente.cliente
+        idcliente = icliente.clienteid
+    # Contar las cuotas pagadas y pendientes
+    cuotas_pagadas = sum(1 for cuota in cuotas_cliente if cuota.estadocuota == 'Pagado') - 1
+    cuotas_pendientes = sum(1 for cuota in cuotas_cliente if cuota.estadocuota == 'Pendiente')
+
+    # Crear los datos de la gráfica
+    labels = ['Pagadas', 'Pendientes']
+    valores = [cuotas_pagadas, cuotas_pendientes]
+
+   # Crea el gráfico circular utilizando Plotly
+    fig = go.Figure(data=[go.Pie(labels=labels, values=valores)])
+    grafica = fig.to_html(full_html=False)
+    
+    # Lista para almacenar los resultados
+    resultados = []
+    ultima_cuota_pagada = Cuotas.query.filter(
+        Cuotas.clienteid==idcliente, 
+        Cuotas.estadocuota=='Pagado', 
+        Cuotas.idcuota>0) \
+            .order_by(Cuotas.fechacuota.desc()).first()
+            # Obtener la siguiente cuota a pagar para el cliente actual
+    siguiente_cuota_pagar = Cuotas.query.filter_by(clienteid=idcliente, estadocuota='Pendiente') \
+                                                .order_by(Cuotas.fechacuota).first()
+    
+    cuota_posterior = Cuotas.query.filter(
+        Cuotas.clienteid == idcliente,
+        Cuotas.estadocuota == 'Pendiente',
+        Cuotas.fechacuota > siguiente_cuota_pagar.fechacuota).order_by(Cuotas.fechacuota).first()    #type: ignore 
+                                    
+    # Calcular el total de cuotas y el saldo pendiente
+    total_cuotas_cliente = Cuotas.query.filter_by(clienteid=idcliente).count() - 1
+    
+    saldo_abonado = Cuotas.query.filter(
+        Cuotas.clienteid==idcliente, 
+        Cuotas.estadocuota=='Pagado', 
+        Cuotas.idcuota > 0)\
+            .with_entities(func.sum(Cuotas.cuotapagadadolar)) \
+                .scalar()
+                                                
+    totalDeuda = total_cuotas_cliente * siguiente_cuota_pagar.cuotadolar #type:ignore
+    saldo_pendiente_cliente  = totalDeuda - saldo_abonado   
+    
+    fechas_cuotas = [cuota.fechacuota for cuota in cuotas_cliente]
+
+    # Calcula la fecha máxima y mínima
+    fecha_maxima = max(fechas_cuotas)
+    fecha_minima = min(fechas_cuotas)
+
+    # Agregar los resultados a la lista
+    resultados.append({
+                'cliente': cliente,
+                'ultima_cuota_pagada': ultima_cuota_pagada,
+                'siguiente_cuota_pagar': siguiente_cuota_pagar, 
+                'saldo_pendiente_cliente': saldo_pendiente_cliente,
+                'cuota_posterior':cuota_posterior,
+                'saldo_abonado': saldo_abonado,
+                'totalDeuda':totalDeuda,
+                'fecha_maxima': fecha_maxima,
+                'fecha_minima': fecha_minima, 
+                'total_cuotas': total_cuotas_cliente
+            })
+    today = datetime.now().date()
+    
+    
+    return render_template('imprimir_cobranza.html', cliente=cuotas_cliente, grafica=grafica, 
+                           dataCliente = resultados, today=today, icliente=icliente)
 
