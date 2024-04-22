@@ -1,0 +1,345 @@
+{%extends "base.html" %}{% block title %}Loteos - SAOS{% endblock %}
+
+{% block main_content %}
+
+<div style="margin:auto; width:80%;">
+    <ul uk-tab>
+        <li><a href="#">Mapa</a></li>
+        <li><a href="#">Movimientos</a></li>
+    </ul>
+    <ul class="uk-switcher uk-margin">
+        <li>
+            <div uk-grid>
+                <div class="uk-width-auto" style="height: 500px; overflow-y:auto; overflow-x:auto;">
+                    <div style="border-right: 1px solid rgba(79, 78, 78, 0.563);">
+                        <h3 style="padding-left:0.5rem;">
+                            <span class="uk-text-background"><b>Loteos SAOS</b></span>
+                        </h3>
+                        <hr>
+                        <ul class="uk-list uk-list-divider" uk-accordion style="padding-left:0.5rem;">
+                            {%for f in files%}
+                            {%for c in centroides%}
+                            {%if c.name == f %}
+                            <li>
+                                <a href="#" class="uk-accordion-title uk-text-small" style="text-decoration: none;"
+                                    id="{{ f.replace('.geojson', '')}}"
+                                    onclick="irLoteo({{c.coords[1]}}, {{c.coords[0]}})">
+                                    <b>{{
+                                        f.replace('.geojson', '')}}</b></a>
+                                <div class="uk-accordion-content" style="padding: 0 0.5rem 0 0.5rem;">
+                                    {%for estado in estados %}
+                                    {%if estado.name == f %}
+                                    <div class="uk-padding-remove">
+                                        <p style="font-size: small; color:green;margin: 0;"> Disponibles:
+                                            {{estado.disponibles}}
+                                        </p>
+                                        <p style="font-size: small; color:rgb(128, 0, 0);margin: 0;"> Vendidos:
+                                            {{estado.vendidos}}</p>
+                                        <p style="font-size: small; color:rgb(26, 28, 121);margin: 0;"> Reservados:
+                                            {{estado.reservados}}</p>
+                                        <p style="font-size: small; color:rgb(47, 47, 47);margin: 0;"> Totales:
+                                            {{estado.total}}
+                                        </p>
+                                    </div>
+                                    {%endif%}
+                                    {%endfor%}
+                                </div>
+
+                            </li>
+                            {%endif%}
+                            {%endfor%}
+                            {%endfor%}
+                        </ul>
+                    </div>
+                </div>
+                <div class="uk-width-expand" style="height:500px; padding-left:1rem;">
+                    <div id="mapLot" style="height: 500px; width: 100%;"></div>
+                </div>
+            </div>
+        </li>
+        <li>
+            <div>
+                <h3 style="padding-left:0.5rem;">
+                    <span class="uk-text-background"><b> Últimos movimientos: </b></span>
+                </h3>
+                <ul uk-tab>
+                    {% for dat in datos %}
+                    {% for key, value in dat.items() %}
+                    {% set nombre = key %}
+                    <li>
+                        <a href="#">
+                            <h6 class="uk-text-small"> {{ nombre }} </h6>
+                        </a>
+                    </li>
+                    {%endfor%}
+                    {%endfor%}
+                </ul>
+                <ul class="uk-switcher uk-margin">
+                    {% for dat in datos %}
+                    {% for key, value in dat.items() %}
+                    {% set nombre = key %}
+                    <li>
+                        <div uk-grid>
+                            <div class="uk-width-auto">
+                                <table id="tabla-{{nombre}}" class="uk-table uk-table-small uk-table-divider">
+                                    <thead>
+                                        <tr class="uk-text-small uk-margin-small">
+                                            <th>Lote</th>
+                                            <th>Estado</th>
+                                            <th>Vendedor</th>
+                                            <th>Comprador</th>
+                                            <th>Fecha</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {%for d in value%}
+                                        <tr class="uk-text-small uk-margin-small">
+                                            <td>{{d.nombrecompleto}}</td>
+                                            <td>{{d.estado}}</td>
+                                            <td>{{d.usuario}}</td>
+                                            <td>{{d.comprador}}</td>
+                                            <td>{{d.fecha}}</td>
+                                        </tr>
+                                        {%endfor%}
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="uk-width-expand">
+                                <h4 class="uk-text-small@s"> <span class="uk-text-background"> Estado del proyecto:
+                                    </span></h4>
+                                {%for g in graphs%}
+                                {%if g.name.replace('.geojson', '') == nombre%}
+                                {{ g.graph | safe}}
+                                {%endif%}
+                                {%endfor%}
+                            </div>
+                        </div>
+                    </li>
+                    {%endfor%}
+                    {%endfor%}
+                </ul>
+            </div>
+        </li>
+    </ul>
+</div>
+<script src="https://unpkg.com/leaflet-simple-map-screenshoter"></script>
+<script>
+
+    var fileNames = {{ files | tojson | safe }};
+
+    var mapLot = L.map("mapLot", {
+        maxZoom: 18,
+        zoomSnap: 0.1,
+    }).setView([-42.9095, -71.3143], 14);
+
+    var Esri_WorldImagery = L.tileLayer(
+        "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+        {
+            attribution:
+                "Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community",
+        }
+    );
+
+    Esri_WorldImagery.addTo(mapLot);
+
+    let pluginOptions = {
+        position: 'topright',
+        screenName: 'estado_proyecto',
+    };
+    this.simpleMapScreenshoter = L.simpleMapScreenshoter(pluginOptions).addTo(this.mapLot)
+    // Function to fetch and add GEOJSON files to the Leaflet map
+    async function fetchAndAddGeojsonToMap() {
+        try {
+            // Iterate through each filename in the list
+            for (let fileName of fileNames) {
+                // Make a fetch request to the GEOJSON file
+                let response = await fetch(`/static/maps/${fileName}`);
+
+                // Check if the response is successful (status code 200)
+                if (!response.ok) {
+                    console.error(`Failed to fetch GEOJSON file ${fileName}`);
+                    continue; // Skip to the next file
+                }
+
+                // Parse the response as JSON
+                let geojsonData = await response.json();
+
+                // Add the GEOJSON data to the Leaflet map
+                addGeojsonToMap(geojsonData);
+            }
+        } catch (error) {
+            console.error("Error fetching or adding GEOJSON files:", error);
+        }
+    };
+
+    // Function to add GEOJSON data to the Leaflet map
+    function addGeojsonToMap(geojsonData) {
+        // Create a GeoJSON layer and add it to the map
+        L.geoJSON(geojsonData, {
+            style: function (feature) {
+                // Get the value of the property to use for coloring (e.g., feature.properties.colorProperty)
+                let colorValue = feature.properties.estado;
+
+                // Define colors based on property values
+                let color;
+                if (colorValue === "DISPONIBLE") {
+                    color = "green";
+                } else if (colorValue === "RESERVADO") {
+                    color = "blue";
+                } else if (colorValue === "VENDIDO") {
+                    color = "red";
+                } else {
+                    color = "yellow";
+                }
+
+                // Return the style object with the desired color
+                return {
+                    fillColor: color,
+                    weight: 1,
+                    opacity: 0.7,
+                    color: "gray",
+                    fillOpacity: 0.5,
+                };
+            },
+            onEachFeature: onEachFeature,
+        }).addTo(mapLot);
+    };
+
+    function highlightFeature(e) {
+        var layer = e.target;
+        layer.setStyle({
+            fillOpacity: 0.9,
+        });
+
+        layer
+            .bindPopup(
+                e.target.feature.properties.nombrecompleto + '<br>' +
+                e.target.feature.properties.estado, {
+                closeButton: false,
+            })
+            .openPopup();
+
+        layer.bringToFront();
+    };
+
+    // Reset on no hover
+    function resetHighlight(e) {
+        var layer = e.target;
+        layer.setStyle({
+            fillOpacity: 0.5,
+        });
+        layer.closePopup();
+    };
+
+    // use functions on every feature
+    function onEachFeature(feature, layer) {
+        layer.on({
+            mouseover: highlightFeature,
+            mouseout: resetHighlight,
+            click: openFormModal,
+        });
+    };
+
+    fetchAndAddGeojsonToMap();
+
+    // open form modal
+    function openFormModal(e) {
+        //TODO: make css code
+        let props = e.target.feature.properties;
+
+        let options = '';
+
+        // Generar las opciones del select según el estado actual
+        if (props.estado === 'VENDIDO') {
+            options = "<option>Reservado</option><option>Disponible</option>";
+        } else if (props.estado === 'RESERVADO') {
+            options = "<option>Disponible</option><option>Vendido</option>";
+        } else if (props.estado === 'DISPONIBLE') {
+            options = "<option>Reservado</option><option>Vendido</option>";
+        }
+        UIkit.modal.dialog(
+            '<form action="/modify_map" method="POST" class="uk-form-stacked">' +
+            '<div class="wrapper-modal-lotes">' +
+            '<div class="form-modal-value">' +
+            '<div class="uk-modal-body">' +
+            "<h3><b>Información del Lote</b></h3>" +
+            '<label class="uk-form-label" for="form-stacked-text">Proyecto</label>' +
+            '<div class="uk-form-controls"><input class="uk-input uk-disabled" type="text" name="loteo" value="' +
+            props.loteo +
+            '"></div></br>' +
+            '<label class="uk-form-label" for="form-stacked-text">Lote</label>' +
+            '<div class="uk-form-controls"><input class="uk-input uk-disabled" type="text" name="parcela" value="' +
+            props.nombrecompleto +
+            '"></div></br>' +
+
+            '<div class="uk-form-controls"><label class="uk-form-label" for="form-stacked-text">Comprador(es)</label>' +
+            '<input class="uk-input" type="text" name="comprador" placeholder="APELLIDO Nombre(s)" ></div></br>' +
+            '<div class="uk-margin">' +
+            '<select id="estado" class="uk-select" aria-label="Select" name="estado" required>' +
+            options +
+            "</select>" +
+            "</div>" +
+            '<div class="uk-container">' +
+            '<button class="uk-button uk-button-secondary uk-button-large" type="submit">Enviar</button>' +
+            "</div>" +
+            "</div>" +
+            "</div>" +
+            "</div>" +
+            "</form>"
+        );
+        setDateToday();
+    };
+
+    function setDateToday() {
+        // Obtener la fecha de hoy
+        var today = new Date();
+
+        // Obtener día, mes y año
+        var day = String(today.getDate()).padStart(2, "0");
+        var month = String(today.getMonth() + 1).padStart(2, "0"); // El mes se indexa desde 0, por lo que se suma 1
+        var year = today.getFullYear();
+
+        // Formatear la fecha en el formato "aaaa-mm-dd"
+        var formattedDate = year + "-" + month + "-" + day;
+
+        // Establecer el valor de la fecha formateada en el input
+        document.getElementById("fechareserva").value = formattedDate;
+    };
+
+    window.onload = function () {
+        var urlParams = new URLSearchParams(window.location.search);
+        var loteo = urlParams.get("loteo");
+        var clickloteo = urlParams.get("clickloteo");
+        // Verificar si se debe realizar la acción
+        if (clickloteo === "True") {
+            UIkit.notification({
+                message:
+                    "<span uk-icon='icon: check'></span> Datos guardados correctamente.",
+                status: "success",
+                timeout: 1200,
+            });
+            // Hacer clic en el botón automáticamente
+            document.getElementById(loteo).click();
+        }
+
+        if (clickloteo === "False") {
+            UIkit.notification({
+                message:
+                    "<ion-icon name='ban-outline'></ion-icon> Error, lote vendido por otro usuario.",
+                status: "danger",
+                timeout: 1200,
+            });
+            // Hacer clic en el botón automáticamente
+            document.getElementById(loteo).click();
+        }
+    };
+
+    function irLoteo(lat, lng) {
+
+        mapLot.flyTo([lat, lng], 17, {
+            duration: 2,
+        });
+    }
+</script>
+
+{%endblock%}

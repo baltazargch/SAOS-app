@@ -6,6 +6,7 @@ from . import db
 from sqlalchemy import func, and_
 from datetime import datetime
 import plotly.io as pio
+import plotly.graph_objs as go
 import os
 import geojson
 import json
@@ -15,10 +16,60 @@ from . import type
 # Estas son las vistas de la app general. 
 views = Blueprint('views', __name__)
 
-# Definir las URL de cada página
-@views.route('/maps_no_user')
-def maps_no_user():
-    return render_template("maps-no-user.html", user=current_user)
+# Mapa para admins
+@views.route('/maps_admin',  methods=['GET', 'POST'])
+@login_required
+def maps_admin():
+    mapdir = os.path.join(os.path.dirname(__file__), 'static', 'maps')
+    files = os.listdir(mapdir)
+    
+    def obtener_fecha(x):
+        return datetime.strptime(x['properties']['fecha'], '%Y-%m-%d')
+        
+    centroides = []
+    estados = []
+    datos = []
+    graphs = []
+    for archivo in files:
+        if type == 'testing':
+            ruta= f'{mapdir}\\{archivo}'
+        else:
+            ruta= f'{mapdir}/{archivo}'
+        with open(ruta) as f:
+            data = geojson.load(f)
+            geometria = from_geojson(geojson.dumps(data)) 
+            centroides.append({"name": archivo, "coords": geometria.centroid.coords[:][0]})
+            feat = data['features'][:]
+            feat = json.loads(json.dumps(feat))
+            disp = sum(1 for fe in feat if fe['properties']['estado'] == 'DISPONIBLE')
+            rese = sum(1 for fe in feat if fe['properties']['estado'] == 'RESERVADO')
+            vend = sum(1 for fe in feat if fe['properties']['estado'] == 'VENDIDO')
+            
+            estados.append({
+                'name': archivo, 
+                'disponibles': disp, 
+                'reservados': rese, 
+                'vendidos': vend, 
+                'total': sum(1 for fe in feat)
+            })
+            
+            graphs.append({
+                'name': archivo, 
+                'graph': pio.to_html(go.Figure(data=[go.Pie(labels=['Disponibles', 'Reservados', 'Vendidos'], 
+                                                values=[disp, rese, vend])]).update_traces(hole=0.4), full_html=False)
+            })
+            
+            # Seleccionar las primeras 10 características con fecha ordenadas
+            feat_with_date = [fe for fe in feat if fe['properties'].get('fecha') is not None]
+            feat_ordenadas = sorted(feat_with_date, key=obtener_fecha, reverse=True)[:10]
+
+            # Agregar características ordenadas al diccionario de datos
+            datos.append({
+                archivo.replace('.geojson', ''): [fe.get('properties', {}) for fe in feat_ordenadas]
+            })
+            
+    return render_template("admin_map.html", user=current_user, files=files, centroides=centroides, 
+                           estados=estados, datos=datos, graphs=graphs)
 
 # Mapa para usuarios
 @views.route('/maps_users',  methods=['GET', 'POST'])

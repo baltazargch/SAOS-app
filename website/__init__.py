@@ -5,7 +5,7 @@ from werkzeug.security import generate_password_hash
 from sqlalchemy import select
 
 type = 'testing'
-
+make_db = True
 db = SQLAlchemy()
 
 if type == 'testing':
@@ -40,15 +40,15 @@ def create_app():
     
     from .models import User
 
-    if type == 'testing':
+    if make_db:
         with app.app_context():
             db.create_all()
             
             # Check if the admin user already exists
-            admin_user = User.query.filter_by(email='saos@saos.com').first()
+            admin_user = User.query.filter_by(email='info@saos.app').first()
             
             if not admin_user:
-                new_user = User(email='saos@saos.com',
+                new_user = User(email='info@saos.app',
                             nombre='saos',
                             apellido='saos',
                             tipo="admin",

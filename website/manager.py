@@ -79,7 +79,6 @@ def registrar_pago(clienteid, cuota):
         db.session.commit()
         return redirect('/admin_pagos')
 
-    
 @manager.route('/set_maps_permits/<id>', methods=['POST'])
 @login_required
 @tipo_usuario_aceptado('admin')
@@ -255,8 +254,14 @@ def modify_map():
         # Guardar los cambios en el archivo GeoJSON modificado
         with open(ruta_archivo, 'w') as f:
             json.dump(contenido_geojson, f)
+    #TODO
+    if current_user.tipo == 'admin':
+        to = 'views.maps_admin'
+    else: 
+        to = 'views.maps_users'
+    #print(request.referrer)
             
-    return redirect(url_for('views.maps_users', loteo=loteo, clickloteo=clickloteo))
+    return redirect(url_for(to, loteo=loteo, clickloteo=clickloteo))
 
 @manager.route('/imprimir_cobranzas/<id>', methods=['GET'])
 @login_required
