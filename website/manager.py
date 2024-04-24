@@ -77,7 +77,7 @@ def registrar_pago(clienteid, cuota):
         cuota.cuotapagadadolar = pagado #type: ignore
         
         db.session.commit()
-        return redirect('/admin_pagos')
+        return redirect(url_for('views.admin_pagos', cliente=clienteid))
 
 @manager.route('/set_maps_permits/<id>', methods=['POST'])
 @login_required

@@ -1,6 +1,6 @@
-from flask import Blueprint, render_template
+from flask import Blueprint, render_template, redirect, send_file
 from flask_login import login_required, current_user
-from .utils import tipo_usuario_aceptado, ultimas_cuotas
+from .utils import tipo_usuario_aceptado, ultimas_cuotas, convert_to_kml
 from .models import Permit, User, Cuotas, Cobranza
 from . import db
 from sqlalchemy import func, and_
@@ -12,6 +12,8 @@ import geojson
 import json
 from shapely import from_geojson
 from . import type
+import io
+
 
 # Estas son las vistas de la app general. 
 views = Blueprint('views', __name__)
@@ -192,7 +194,10 @@ def admincuotas():
 @login_required
 @tipo_usuario_aceptado('admin')
 def admin_descargas():
-    return render_template('admin_descargas.html', user=current_user)
+    mapdir = os.path.join(os.path.dirname(__file__), 'static', 'maps')
+    files = os.listdir(mapdir)
+    
+    return render_template('admin_descargas.html', user=current_user, files=files)
 
 @views.route('/admin_pagos', methods=['GET'])
 @login_required
@@ -207,7 +212,7 @@ def admin_pagos():
         # Obtener una lista de clientes únicos para el usuario actual
         clientes = db.session.query(Cuotas.clienteid).filter_by(user_id=user.id).distinct().all()
         
-    # Iterar sobre cada cliente único
+        # Iterar sobre cada cliente único
         for cliente in clientes:
             cliente = cliente[0]  # El resultado es una tupla, así que tomamos el primer elemento
             # Obtener la última cuota pagada para el cliente actual
@@ -223,15 +228,21 @@ def admin_pagos():
             # Calcular el total de cuotas y el saldo pendiente
             total_cuotas_cliente = Cuotas.query.filter(and_(Cuotas.clienteid == cliente, Cuotas.idcuota > 0)).count()
             
-            saldo_abonado = db.session.query(func.sum(Cuotas.cuotapagadadolar)) \
-                                        .filter_by(clienteid=cliente, estadocuota='Pagado').scalar()
+            saldo_abonado = Cuotas.query.filter(
+                Cuotas.clienteid==cliente, 
+                Cuotas.estadocuota=='Pagado', 
+                Cuotas.idcuota > 0)\
+                    .with_entities(func.sum(Cuotas.cuotapagadadolar)) \
+                        .scalar()
                                                 
             totalDeuda = total_cuotas_cliente * siguiente_cuota_pagar.cuotadolar #type:ignore
             if saldo_abonado:
                 saldo_pendiente_cliente  = totalDeuda - saldo_abonado 
             else:
                 saldo_pendiente_cliente=totalDeuda
-               
+            
+            totalVenta = totalDeuda + db.session.query(Cuotas.cuotapagadadolar).filter_by(idcuota=0, clienteid = cliente ).scalar()
+            print(totalVenta)
             labelColor=""
             estado = ""
             if siguiente_cuota_pagar.fechacuota < datetime.now().date(): #type:ignore
@@ -255,6 +266,7 @@ def admin_pagos():
                 'labelColor' : labelColor, 
                 'estado':estado,
                 'totalDeuda':totalDeuda,
+                'totalVenta':totalVenta
             })
                                             
     return render_template('admin_pagos.html', user=current_user, cuotas=cuotas, usuarios=usuarios, 
@@ -308,3 +320,16 @@ def admin_cashflow():
     if not usuarios: 
         usuarios = []
     return render_template('admin_cashflow.html', user=current_user, cashflow=cashflow, usuarios=usuarios)
+
+@views.route('/maps_descargas/<map>')
+@login_required
+@tipo_usuario_aceptado('admin')
+def maps_descargas(map):
+    if map: 
+        filemap = os.path.join(os.path.dirname(__file__), 'static', 'maps', map)
+        
+        kml_data = convert_to_kml(filemap)
+
+        # Enviar el archivo KMZ al cliente
+    return send_file(io.BytesIO(kml_data.encode()), mimetype='application/vnd.google-earth.kml+xml', 
+                     as_attachment=True, download_name=str(datetime.now().date()) + '_' + map.replace('.geojson', '.kml'))

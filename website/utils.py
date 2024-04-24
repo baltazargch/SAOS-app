@@ -9,6 +9,7 @@ from datetime import timedelta, datetime
 from io import StringIO
 import csv
 import calendar
+import geojson
 
 def tipo_usuario_aceptado(tipo):
     def decorator(func):
@@ -203,3 +204,76 @@ def ultimas_cuotas(id):
         })
 
     return resultados
+
+def get_color_from_property(property_value):
+    if property_value == 'DISPONIBLE':
+        return '7d00ff00'  # Verde
+    elif property_value == 'VENDIDO':
+        return '7d0000ff'  # Rojo
+    elif property_value == 'RESERVADO':
+        return '7dff0000'  # Azul
+    else: 
+        return '7d00ffff'  # Amarillo
+
+def convert_to_kml(filemap):
+    with open(filemap) as f:
+        data = geojson.load(f)
+        
+    # Inicializar el contenido del archivo KML
+    kml_data = '<?xml version="1.0" encoding="UTF-8"?>\n'
+    kml_data += '<kml xmlns="http://www.opengis.net/kml/2.2">\n'
+    kml_data += '<Document>\n'
+
+        # Iterar sobre cada característica en el archivo GeoJSON
+    for feature in data['features']:
+        # Obtener las propiedades de la característica
+        properties = feature.get('properties', {})
+        prop0 = properties.get('loteo', '')
+        prop1 = properties.get('nombrecompleto', '')
+        prop2 = properties.get('estado', '')
+        
+        # Obtener el color basado en la propiedad prop1
+        color = get_color_from_property(prop2)
+        print(color, prop2)
+        # Obtener las coordenadas de los polígonos
+        coordinates = feature['geometry']['coordinates']
+
+        # Agregar el polígono al archivo KML con las propiedades
+        kml_data += f'  <Placemark>\n'
+        kml_data += f'    <name>{prop0.upper()}</name>\n'
+        kml_data += f'    <Style>\n'
+        kml_data += f'      <LineStyle>\n'
+        kml_data += f'        <color>ff000000</color>\n'  # Borde negro
+        kml_data += f'      </LineStyle>\n'
+        kml_data += f'      <PolyStyle>\n'
+        kml_data += f'        <color>{color}</color>\n'
+        kml_data += f'        <outline>1</outline>\n'  # Borde
+        kml_data += f'      </PolyStyle>\n'
+        kml_data += f'    </Style>\n'
+        kml_data += f'    <ExtendedData>\n'
+        kml_data += f'      <Data name="LOTEO">\n'
+        kml_data += f'        <value>{prop1}</value>\n'
+        kml_data += f'      </Data>\n'
+        kml_data += f'      <Data name="ESTADO">\n'
+        kml_data += f'        <value>{prop2}</value>\n'
+        kml_data += f'      </Data>\n'
+        kml_data += f'    </ExtendedData>\n'
+        kml_data += f'    <Polygon>\n'
+        kml_data += f'      <outerBoundaryIs>\n'
+        kml_data += f'        <LinearRing>\n'
+        kml_data += f'          <coordinates>\n'
+        for ring in coordinates:
+            for lon, lat in ring:
+                kml_data += f'            {lon},{lat},0\n'
+            kml_data += f'            {ring[0][0]},{ring[0][1]},0\n'  # Cerrar el anillo
+        kml_data += f'          </coordinates>\n'
+        kml_data += f'        </LinearRing>\n'
+        kml_data += f'      </outerBoundaryIs>\n'
+        kml_data += f'    </Polygon>\n'
+        kml_data += f'  </Placemark>\n'
+
+    # Finalizar el archivo KML
+    kml_data += '</Document>\n'
+    kml_data += '</kml>\n'
+        
+    return kml_data

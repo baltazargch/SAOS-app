@@ -29,7 +29,7 @@
                 </a>
             </div>
             <div>
-                <a href="#">
+                <a href="#modal-maps" uk-toggle>
                     <div class="uk-card uk-card-hover">
                         <div class="uk-card-media-top"
                             style="display: flex; justify-content: center ;align-items: center;">
@@ -37,7 +37,7 @@
                         </div>
                         <div class="uk-card-body">
                             <h3 class="uk-card-title">Mapas</h3>
-                            <p>Descarga la información de loteos (.csv)</p>
+                            <p>Descarga la información de loteos (.kml)</p>
                         </div>
                     </div>
                 </a>
@@ -58,18 +58,41 @@
             </div>
         </div>
     </div>
-    <script>
-        document.getElementById('donwload__data').addEventListener('click', function (event) {
-            event.preventDefault(); // Evita el comportamiento predeterminado de navegación
+    <div>
+        <div id="modal-maps" uk-modal>
+            <div class="uk-modal-dialog">
+                <button class="uk-modal-close-default" type="button" uk-close></button>
+                <div class="uk-modal-header">
+                    <h2 class="uk-modal-title">Descargar mapas</h2>
+                </div>
+                <div class="uk-modal-body">
+                    <p class="uk-text-warning">Mapas disponibles para descargar (.kml)</p>
+                    <div class="uk-grid-match" uk-grid style="margin: auto;">
+                        {%for f in files %}
+                        <div class="uk-margin-remove uk-padding-small uk-text-small 
+                            uk-card-small uk-width-auto uk-card uk-card-hover uk-card-body">
+                            <a href="/maps_descargas/{{f}}">{{ f.replace('.geojson', '') }}</a>
+                        </div>
+                        {%endfor%}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
-            // Crea un formulario y agrega un campo de entrada
-            var form = document.createElement('form');
-            form.method = 'POST';
-            form.action = '/descargar_csv'; // La URL a la que se enviará la solicitud POST
+<script>
+    document.getElementById('donwload__data').addEventListener('click', function (event) {
+        event.preventDefault(); // Evita el comportamiento predeterminado de navegación
 
-            // Agrega el formulario al cuerpo del documento y envíalo
-            document.body.appendChild(form);
-            form.submit();
-        });
-    </script>
-    {%endblock%}
+        // Crea un formulario y agrega un campo de entrada
+        var form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '/descargar_csv'; // La URL a la que se enviará la solicitud POST
+
+        // Agrega el formulario al cuerpo del documento y envíalo
+        document.body.appendChild(form);
+        form.submit();
+    });
+</script>
+{%endblock%}
