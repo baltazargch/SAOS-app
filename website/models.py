@@ -2,7 +2,17 @@ from . import db
 from flask_login import UserMixin
 from sqlalchemy.sql import func
 from sqlalchemy import CheckConstraint, Date
+import calendar
+from datetime import datetime
 
+# Funcs to make column month year
+mes_actual = datetime.now().strftime("%B")  # Obtener el nombre del mes actual en inglés
+mes_actual_espanol = calendar.month_name[int(datetime.now().strftime("%m"))]  # Traducir el nombre del mes al español
+anio_actual = datetime.now().strftime("%Y")  # Obtener el año actual
+
+mes_y_anio = f"{mes_actual_espanol.capitalize()} {anio_actual}"
+
+# GENERAL DATA
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(250), unique=True)
@@ -25,7 +35,8 @@ class Permit(db.Model):
     mappermits = db.Column(db.JSON) 
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     user = db.relationship('User', back_populates='permits')
-    
+
+# COBRANZAS
 class Cuotas(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     fecha = db.Column(db.DateTime(timezone=False), default=func.now())
@@ -48,22 +59,6 @@ class Cuotas(db.Model):
     __table_args__ = (
         CheckConstraint(estadocuota.in_(['Pagado', 'Pendiente', 'Vencido']), name='estadocuota_valido'),
     )
-    
-class Cashflow(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    fecha = db.Column(db.DateTime(timezone=True), default=func.now())
-    cliente = db.Column(db.String(250))
-    clienteid = db.Column(db.String(250))
-    proyecto = db.Column(db.String(250))
-    idmov = db.Column(db.Integer)
-    movdolar = db.Column(db.Integer)
-    movpesos = db.Column(db.Integer)
-    fechamov = db.Column(Date)
-    razonsocial = db.Column(db.String(250))
-    responsable = db.Column(db.String(250))
-    notas = db.Column(db.String(250))
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    user = db.relationship('User', back_populates='cashflow')
 
 class Cobranza(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -71,3 +66,26 @@ class Cobranza(db.Model):
     proyecto = db.Column(db.String(250))
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     user = db.relationship('User', back_populates='cobranza')
+    
+# CASH FLOW
+class Cashflow(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    fecha = db.Column(db.DateTime(timezone=True), default=func.now())
+    mesanio = db.Column(db.String(20), default=mes_y_anio)
+    subrubro_id = db.Column(db.Integer, db.ForeignKey('subrubro.id'), nullable=False)
+    montousd = db.Column(db.Float, nullable=False)
+    montoarg = db.Column(db.Float, nullable=False)
+    descripcion = db.Column(db.String(255))
+    empresa = db.Column(db.String(250))
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    user = db.relationship('User', back_populates='cashflow')
+
+class Rubro(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    nombre = db.Column(db.String(100), nullable=False)
+    subrubros = db.relationship('Subrubro', backref='rubro', lazy=True,  cascade="all, delete-orphan")
+
+class Subrubro(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    nombre = db.Column(db.String(100), nullable=False)
+    rubro_id = db.Column(db.Integer, db.ForeignKey('rubro.id'), nullable=False)

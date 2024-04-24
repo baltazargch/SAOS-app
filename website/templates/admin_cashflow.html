@@ -3,7 +3,7 @@
 {% block main_content %}
 <div style="padding-top:1rem; width: 85%;margin: auto;">
     <div uk-grid>
-        <div class="uk-widht-1-6">
+        <div class="uk-width-auto">
             <div style="border-right: 1px solid rgba(0,0,0,0.2); padding-right:1rem;">
                 <form action="new_cashflow" method='POST'>
                     <fieldset class="uk-fieldset">
@@ -45,37 +45,198 @@
                 </form>
             </div>
         </div>
-        <div class="uk-widht-5-6">
-            <div uk-nav>
-                <div></div>
+        <div class="uk-width-expand">
+            <ul uk-tab>
+                <li class="uk-active"><a href="">Rubros</a></li>
+                <li><a href="">Movimientos</a></li>
+            </ul>
+            <ul class="uk-switcher uk-margin">
+                <li>
+                    <div uk-grid>
+                        <div class="uk-width-auto">
+                            <div>
+                                <div style="padding: 1rem 1rem; border: 1px dashed rgba(53, 53, 53, 0.5)">
+                                    <form action="/agregar_rubro/rubro" method="POST">
+                                        <fieldset class="uk-fieldset">
+                                            <legend class="uk-legend uk-text-small"><b>Nuevo rubro:</b>
+                                            </legend>
+                                            <br>
+                                            <div class="uk-form-controls">
+                                                <div class="uk-margin">
+                                                    <div class="uk-form-controls">
+                                                        <input type="text" class="uk-input" name="rubro"
+                                                            placeholder="e.g., Costos fijos">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <button type="submit"
+                                                class="uk-button uk-button-secondary .uk-width-1-1">Agregar</button>
+                                        </fieldset>
+                                    </form>
+                                </div>
+                            </div>
+                            <hr class="uk-divider-icon">
+                            <div>
+                                <div style="padding: 1rem 1rem; border: 1px dashed rgba(53, 53, 53, 0.5)">
+                                    <form action="/agregar_rubro/subrubro" method="POST">
+                                        <fieldset class="uk-fieldset">
+                                            <legend class="uk-legend uk-text-small"><b>Nuevo subrubro:</b>
+                                            </legend>
+                                            <br>
+                                            <div class="uk-form-controls">
+                                                <div class="uk-margin">
+                                                    <div class="uk-form-controls">
+                                                        <select class="uk-select" name="selectrubro">
+                                                            {% for rubro in rubros %}
+                                                            <option value="{{ rubro.id }}">{{
+                                                                rubro.nombre }}</option>
+                                                            {% endfor %}
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            {%for sub in subrubros%}
+                                            {{sub.nombre}}
+                                            {%endfor%}
+                                            <div class="uk-form-controls">
+                                                <div class="uk-margin">
+                                                    <div class="uk-form-controls">
+                                                        <input type="text" class="uk-input" name="subrubro"
+                                                            placeholder="e.g., Servicios">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <button type="submit"
+                                                class="uk-button uk-button-secondary .uk-width-1-1">Agregar</button>
+                                        </fieldset>
+                                    </form>
+                                </div>
 
-            </div>
+                            </div>
+                        </div>
+                        <div class="uk-width-expand">
+                            <p class="uk-text-warning"> Rubros y subrubros disponibles.</p>
+                            <div class="uk-overflow-auto" style="justify-content:center; width:100%;">
+                                <table id="tabla-rubros" class="uk-table uk-table-small uk-table-divider">
+                                    <thead>
+                                        <tr>
+                                            <th>Rubro</th>
+                                            <th>Eliminar</th>
+                                            <th>Subrurbos</th>
+                                            <th>Eliminar</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {%for rub in rubros %}
+
+                                        <tr>
+                                            <td>{{rub.nombre}}</td>
+                                            <td>
+                                                <div style="display:flex; justify-content: center;">
+                                                    <a href="/delete_rubro/rubro/{{ rub.id }}">
+                                                        <button class="uk-button-small uk-button-danger delete-rubro"
+                                                            type="submit"><ion-icon name="close-outline"
+                                                                size="medium"></ion-icon></button>
+                                                    </a>
+                                                </div>
+                                            </td>
+                                            {%for sub in subrubros%}
+                                            {%if sub.rubro_id == rub.id %}
+                                            <td>{{sub.nombre}}</td>
+
+                                            <td>
+                                                <div style="display:flex; justify-content: center;">
+                                                    <a href="/delete_rubro/subrubro/{{ sub.id }}">
+                                                        <button class="uk-button-small uk-button-danger delete-rubro"
+                                                            type="submit"><ion-icon name="close-outline"
+                                                                size="medium"></ion-icon></button>
+                                                    </a>
+                                                </div>
+                                            </td>
+                                            {%endif%}
+                                            {%endfor%}
+                                        </tr>
+
+                                        {%endfor%}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+                <li>
+                    <div>
+                        <div class=" uk-width-auto" uk-grid>
+                            <form action="" method="POST">
+                                <fieldset class="uk-fieldset">
+                                    <div class="uk-form-controls">
+                                        <div class="uk-margin">
+                                            <div class="uk-form-controls">
+                                                <label for="rubro">Rubro:</label>
+                                                <select id="rubro" name="rubro" required>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="uk-form-controls">
+                                        <div class="uk-margin">
+                                            <div class="uk-form-controls">
+                                                </select>
+
+                                                <label for="subrubro">Subrubro:</label>
+                                                <select id="subrubro" name="subrubro" required>
+
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="uk-form-controls">
+                                        <div class="uk-margin">
+                                            <div class="uk-form-controls">
+                                                <label for="monto">Monto:</label>
+                                                <input type="number" id="monto" name="monto" required>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="uk-form-controls">
+                                        <div class="uk-margin">
+                                            <div class="uk-form-controls">
+                                                <label for="fecha">Fecha:</label>
+                                                <input type="date" id="fecha" name="fecha" required>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="uk-form-controls">
+                                        <div class="uk-margin">
+                                            <div class="uk-form-controls">
+                                                <label for="descripcion">Descripción:</label>
+                                                <textarea id="descripcion" name="descripcion"></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <button type="submit">Registrar
+                                        Movimiento</button>
+                                </fieldset>
+                            </form>
+                        </div>
+                    </div>
+                </li>
+            </ul>
         </div>
     </div>
 </div>
 <script>
 
-    // Función para ocultar todos los paneles al cargar la página
-    window.onload = function () {
-        // Ocultar todos los paneles
-        var panels = document.querySelectorAll('#cuotas-content > div');
-        panels.forEach(function (panel) {
-            panel.style.display = 'none';
-        });
-    };
+    const btnDelete = document.querySelectorAll('.delete-rubro');
 
-    function showPanel(panelId) {
-        // Ocultar todos los paneles
-        var panels = document.querySelectorAll('#cuotas-content > div');
-        panels.forEach(function (panel) {
-            panel.style.display = 'none';
+    if (btnDelete) {
+        arrayDelete = Array.from(btnDelete);
+        arrayDelete.forEach((btn) => {
+            btn.addEventListener('click', (e) => {
+                if (!confirm('¿Estás seguro de que quieres eliminar este (sub)rubro?')) {
+                    e.preventDefault();
+                }
+            });
         });
-
-        // Mostrar el panel deseado
-        var panelToShow = document.getElementById(panelId);
-        if (panelToShow) {
-            panelToShow.style.display = 'block';
-        }
     };
 
 </script>

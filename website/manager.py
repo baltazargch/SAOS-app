@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, request, flash, redirect, url_for, Response
-from .models import User, Permit, Cuotas, Cobranza
+from .models import *
 from . import db
 from flask_login import login_required, current_user
 from .utils import tipo_usuario_aceptado, crear_cuotas_usuario, generar_csv_cuotas
@@ -337,3 +337,56 @@ def print_cobranzas(id):
     return render_template('imprimir_cobranza.html', cliente=cuotas_cliente, grafica=grafica, 
                            dataCliente = resultados, today=today, icliente=icliente)
 
+@manager.route('/agregar_rubro/<tipo>', methods=['POST'])
+@login_required
+@tipo_usuario_aceptado('admin')
+def agregar_rubros(tipo):
+    if request.method == 'POST':
+        if tipo == 'rubro': 
+            nombre_rubro = request.form['rubro'].upper()
+            
+            exists = Rubro.query.filter_by(nombre = nombre_rubro).first()
+            print(exists)
+            if exists:
+                flash('El rubro especificado ya existe', 'error')
+            else:
+                rubro = Rubro(nombre=nombre_rubro) #type:ignore
+                db.session.add(rubro)
+                db.session.commit()
+                flash('Rubro creado correctamente', 'success')
+        
+        if tipo == 'subrubro':
+            rubroid = request.form['selectrubro']
+            nombre_subrubro = request.form['subrubro'].upper()
+            exists = Subrubro.query.filter_by(
+                 rubro_id = rubroid, 
+                 nombre=nombre_subrubro
+             ).first()
+            if exists:
+                flash('El subrubro especificado ya existe', 'error')
+            else:
+                subrubro = Subrubro(nombre=nombre_subrubro, rubro_id=rubroid) #type:ignore
+                db.session.add(subrubro)
+                db.session.commit()
+                flash('Subrubro creado correctamente', 'success')
+    return redirect(url_for('views.admin_cashflow'))
+
+
+@manager.route('/delete_rubro/<tipo>/<string:id>', methods=['GET'])
+@login_required
+@tipo_usuario_aceptado('admin')
+def delete_subrubro(tipo, id):
+    if tipo == 'rubro':
+        rubro = Rubro.query.filter_by(id = id).first()
+        if rubro:
+            db.session.delete(rubro)
+            db.session.commit()
+            flash('Rubro eliminado correctamente.', 'success')
+            
+    if tipo == 'subrubro':
+        subrubro = Subrubro.query.filter_by(id = id).first()
+        if subrubro:
+            db.session.delete(subrubro)
+            db.session.commit()
+            flash('Subrubro eliminado correctamente.', 'success')
+    return redirect(url_for('views.admin_cashflow'))

@@ -10,20 +10,20 @@
     <p>A continuación, encontrarás los servicios habilitados. Contacta al equipo SAOS para potenciar
         tus servicos.</p>
     <br>
-    <div style="display:flex; justify-content: center;">
-        <div class="uk-child-width-1-1@s uk-child-width-1-{{ cols }}@m uk-grid-small uk-grid-match" uk-grid
-            style="{% if cols == 1 %} width: 25%; {% elif cols == 2 %} width: 50%; {% endif %}">
+    <div>
+        <div class="uk-child-width-auto uk-text-center admin__dash uk-flex-center" uk-grid="masonry:pack;"
+            style="font-size: smaller;">
             <div>
                 {% if permits.loteos == 'Si' %}
                 <a href="/user_cuotas">
-                    <div class="uk-card uk-card-hover">
+                    <div class="uk-card uk-card-hover uk-margin-small">
                         <div class="uk-card-media-top"
-                            style="display: flex; justify-content: center ;align-items: center; margin:auto; height:10rem;">
+                            style="display: flex; justify-content: center ;align-items: center;">
                             <ion-icon name="cash-outline" class="ion-icon-xl"></ion-icon>
                         </div>
-                        <div class="uk-card-body">
+                        <div class="uk-card-body uk-margin-small uk-padding-small">
                             <h3 class="uk-card-title">Cobranzas</h3>
-                            <p>Tu portal de pago cuotas y estados de cuentas.</p>
+                            <p>Portal de pagos y estados de cuentas</p>
                         </div>
                     </div>
                 </a>
@@ -32,15 +32,15 @@
             <div>
                 {% if permits.mapas == 'Si'%}
                 <a href="/maps_users">
-                    <div class="uk-card uk-card-hover">
+                    <div class="uk-card uk-card-hover uk-margin-small">
                         <div class="uk-card-media-top"
-                            style="display: flex; justify-content: center ;align-items: center; margin:auto; height:10rem;">
+                            style="display: flex; justify-content: center ;align-items: center;">
                             <ion-icon name="map-outline" class="ion-icon-xl"></ion-icon>
                         </div>
 
-                        <div class="uk-card-body">
+                        <div class="uk-card-body uk-margin-small uk-padding-small">
                             <h3 class="uk-card-title">Loteos</h3>
-                            <p>Gestiona tus ventas en loteos.</p>
+                            <p>Gestiona tus ventas en loteos</p>
                         </div>
                     </div>
                 </a>
@@ -49,20 +49,20 @@
             <div>
                 {% if permits.construccion == 'Si' %}
                 <a href="#">
-                    <div class="uk-card uk-card-hover">
+                    <div class="uk-card uk-card-hover uk-margin-small">
                         <div class="uk-card-media-top"
-                            style="display: flex; justify-content: center ;align-items: center; margin:auto; height:10rem;">
+                            style="display: flex; justify-content: center ;align-items: center;">
                             <ion-icon name="cash-outline" class="ion-icon-xl"></ion-icon>
                         </div>
 
-                        <div class="uk-card-body">
+                        <div class="uk-card-body uk-margin-small uk-padding-small">
                             <h3 class="uk-card-title">Flujo de efectivo</h3>
-                            <p>Accede a información actualizada sobre la administración de tus proyectos</p>
+                            <p>Visualiza gastos de tus proyectos</p>
                         </div>
                     </div>
                 </a>
                 {%endif%}
             </div>
+            </>
         </div>
-    </div>
-    {% endblock %}
+        {% endblock %}

@@ -130,6 +130,7 @@
                             <tbody>
                                 {%if permitsUser != ''%}
                                 {%for permUser in permitsUser%}
+                                {%if permUser.user.tipo == 'user'%}
                                 <tr>
                                     <form action="edit_permits" method="POST">
                                         <td> {{ permUser.user.nombre }} </td>
@@ -153,6 +154,7 @@
                                         </td>
                                     </form>
                                 </tr>
+                                {%endif%}
                                 {%endfor%}
                                 {%endif%}
                             </tbody>

@@ -3,7 +3,7 @@ from flask import abort, Flask
 from flask_login import current_user
 from .models import User, Permit, Cuotas
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import func
+from sqlalchemy import func, and_
 from . import db
 from datetime import timedelta, datetime
 from io import StringIO
@@ -156,7 +156,7 @@ def generar_csv_cuotas():
     # Regresamos el contenido del archivo CSV
     return output.getvalue()
 
-def ultimas_cuotas(id):
+def ultimas_cuotas(id, userName):
     # Obtener una lista de clientes únicos para el usuario actual
     clientes = db.session.query(Cuotas.clienteid).filter_by(user_id=id).distinct().all()
     
@@ -167,19 +167,33 @@ def ultimas_cuotas(id):
     for cliente in clientes:
         cliente = cliente[0]  # El resultado es una tupla, así que tomamos el primer elemento
         # Obtener la última cuota pagada para el cliente actual
-        ultima_cuota_pagada = Cuotas.query.filter_by(clienteid=cliente, estadocuota='Pagado') \
-                                          .order_by(Cuotas.fechacuota.desc()).first()
+        ultima_cuota_pagada = Cuotas.query\
+            .filter(and_(Cuotas.clienteid == cliente, Cuotas.estadocuota == 'Pagado', Cuotas.idcuota > 0)) \
+                                .order_by(Cuotas.fechacuota.desc()).first()
+        
         # Obtener la siguiente cuota a pagar para el cliente actual
-        siguiente_cuota_pagar = Cuotas.query.filter_by(clienteid=cliente, estadocuota='Pendiente') \
-                                            .order_by(Cuotas.fechacuota).first()
+        siguiente_cuota_pagar = Cuotas.query\
+            .filter(and_(Cuotas.clienteid == cliente, Cuotas.estadocuota == 'Pendiente', Cuotas.idcuota > 0)) \
+                                    .order_by(Cuotas.fechacuota).first()
                                             
         # Calcular el total de cuotas y el saldo pendiente
-        total_cuotas_cliente = Cuotas.query.filter_by(clienteid=cliente).count()
-        saldo_pendiente_cliente = db.session.query(func.sum(Cuotas.cuotadolar)) \
-                                     .filter_by(clienteid=cliente, estadocuota='Pendiente').scalar()
-                                              
+        total_cuotas_cliente = Cuotas.query.filter(and_(Cuotas.clienteid == cliente, Cuotas.idcuota > 0)).count()
+        
+        saldo_abonado = Cuotas.query.filter(
+            Cuotas.clienteid==cliente, 
+            Cuotas.estadocuota=='Pagado', 
+            Cuotas.idcuota > 0)\
+                .with_entities(func.sum(Cuotas.cuotapagadadolar)) \
+                    .scalar()
+                                            
         totalDeuda = total_cuotas_cliente * siguiente_cuota_pagar.cuotadolar #type:ignore
-                        
+        if saldo_abonado:
+            saldo_pendiente_cliente  = totalDeuda - saldo_abonado 
+        else:
+            saldo_pendiente_cliente=totalDeuda
+        
+        totalVenta = totalDeuda + db.session.query(Cuotas.cuotapagadadolar).filter_by(idcuota=0, clienteid = cliente ).scalar()
+        
         labelColor=""
         estado = ""
         if siguiente_cuota_pagar.fechacuota < datetime.now().date(): #type:ignore
@@ -194,13 +208,16 @@ def ultimas_cuotas(id):
 
         # Agregar los resultados a la lista
         resultados.append({
+            'user': userName,
             'cliente': cliente,
             'ultima_cuota_pagada': ultima_cuota_pagada,
             'siguiente_cuota_pagar': siguiente_cuota_pagar, 
             'saldo_pendiente_cliente': saldo_pendiente_cliente,
+            'saldo_abonado': saldo_abonado,
             'labelColor' : labelColor, 
             'estado':estado,
             'totalDeuda':totalDeuda,
+            'totalVenta':totalVenta
         })
 
     return resultados

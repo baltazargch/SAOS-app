@@ -1,179 +1,219 @@
 {% extends "base.html" %} {% block title %} Cuotas SAOS {% endblock %}
 
 {% block main_content %}
-<div style="width:80%; padding-left:1rem; margin:auto;">
-    {% if cuotas %}
-    <div uk-grid class="uk-child-width-expand">
+<div style="width: 75%; margin: auto;">
+    <div class="uk-position-cover uk-position-relative">
+        {% if cuotas %}
+        <div uk-grid class="uk-child-width-expand">
 
-        <div id="sidebar" class="uk-width-auto@m uk-visible">
-            <ul class="uk-tab-left" uk-tab="connect: #component-tab-left; animation: uk-animation-fade"
-                style="padding-left: 0.5rem;" uk-tab>
-                {% for cliente in clientes %}
-                {% for id in cliente.cuentasid %}
-                <li class="uk-active uk-width-auto">
-                    <a href="#">
-                        <div class="cliente__deuda">
-                            <div style="display: flex; justify-content:space-between;">
-                                <div>
-                                    {{ cliente.cliente }}
-                                    <p style="color:gray; font-size:10px;">
-                                        {{ id.replace(cliente.cliente.replace(' ','-').lower(),'').replace('-',' ')
-                                        }}
-                                    </p>
-                                </div>
-                                <div style="display:flex; justify-content:flex-end;">
-                                    {% for nxct in next_cuotas %}
-                                    {%if nxct.cliente == id %}
-                                    {%if nxct.labelColor == 'danger'%}
-                                    <span class="uk-badge">1</span>
-                                    {%endif%}
-                                    {%endif%}
-                                    {%endfor%}
+            <div id="sidebar" class="uk-width-auto@m uk-visible">
+                <ul class="uk-tab-left" uk-tab="connect: #component-tab-left; animation: uk-animation-fade"
+                    style="padding-left: 0.5rem;" uk-tab>
+                    {% for cliente in clientes %}
+                    {% for id in cliente.cuentasid %}
+                    <li class="uk-active uk-width-auto" style="padding-top: 1rem;">
+                        <a href="#">
+                            <div class="cliente__deuda">
+                                <div style="display: flex; justify-content:space-between;">
+                                    <div>
+                                        {{ cliente.cliente }}
+                                        <p style="color:gray; font-size:10px;">
+                                            {{ id.replace(cliente.cliente.replace(' ','-').lower(),'').replace('-',' ')
+                                            }}
+                                        </p>
+                                    </div>
+                                    <div style="display:flex; justify-content:flex-end;">
+                                        {% for nxct in next_cuotas %}
+                                        {%if nxct.cliente == id %}
+                                        {%if nxct.labelColor == 'danger'%}
+                                        <span class="uk-badge">1</span>
+                                        {%endif%}
+                                        {%endif%}
+                                        {%endfor%}
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    </a>
-                </li>
-                {% endfor %}
-                {% endfor %}
-            </ul>
-        </div>
+                        </a>
+                    </li>
+                    {% endfor %}
+                    {% endfor %}
+                </ul>
+            </div>
 
-        <div class="uk-width-auto@s uk-hidden@m">
-            <!-- Botón para mostrar/ocultar la columna lateral en dispositivos pequeños -->
-            <button class="uk-button uk-button-default uk-margin-small-right" type="button"
-                uk-toggle="target: #sidebar"><ion-icon name="menu-outline"></ion-icon></button>
-        </div>
-        <div class="uk-width-expand">
-            <ul id="component-tab-left" class="uk-switcher">
-                {%for cliente in clientes %}
-                {% for id in cliente.cuentasid %}
-                <li>
-                    <div class="user__cuotas" style="display: flex; justify-content:space-between; align-items:center;">
-                        <div>
-                            <h2> <span class="uk-text-background"> Estado de cuenta: {{
-                                    cliente.cliente }}</span></h2>
+            <div class="uk-width-auto@s uk-hidden@m">
+                <!-- Botón para mostrar/ocultar la columna lateral en dispositivos pequeños -->
+                <button class="uk-button uk-button-default uk-margin-small-right" type="button"
+                    uk-toggle="target: #sidebar"><ion-icon name="menu-outline"></ion-icon></button>
+            </div>
+            <div class="uk-width-expand">
+                <ul id="component-tab-left" class="uk-switcher">
+                    {%for cliente in clientes %}
+                    {% for id in cliente.cuentasid %}
+                    <li style="padding-top: 1rem;">
+                        <!-- Header of the client section -->
+                        <div class="uk-flex-between" uk-grid>
+                            <div>
+                                <h2>
+                                    <span class="uk-text-background"> Estado de cuenta </span>
+                                </h2>
+                            </div>
+                            <div>
+                                <a href="/imprimir_cobranzas/{{id}}" target="_blank">
+                                    <button class="uk-button uk-button-secondary uk-button-small" type="button">
+                                        <ion-icon name="print-outline" size="medium"></ion-icon>
+                                        Imprimir resumen
+                                    </button>
+                                </a>
+                            </div>
                         </div>
-                        <div>
-                            <a href="/imprimir_cobranzas/{{id}}" target="_blank">
-                                <button class="uk-button uk-button-primary">Imprimir</button>
-                            </a>
-                        </div>
-                    </div>
-                    {% for nxct in next_cuotas %}
-                    {%if nxct.cliente == id %}
-                    <div class="uk-child-width-1-2@m" uk-grid>
-                        <div>
-                            <div class="uk-card uk-card-default uk-card-body uk-margin-small">
-                                <h3 class="uk-card-title"><b><ion-icon name="id-card-outline" size="large"></ion-icon>
-                                        Datos
-                                        de cuenta:</b></h3>
-                                <div uk-grid class="uk-child-width-1-3">
-                                    <div>
-                                        <p>Proyecto: {{ nxct.siguiente_cuota_pagar.proyecto }}</p>
-                                        <p>Lote: {{ nxct.siguiente_cuota_pagar.lote }}</p>
+                        {% for nxct in next_cuotas %}
+                        {%if nxct.cliente == id %}
+                        <div class="uk-child-width-expand" uk-grid="masonry: pack;">
+                            <div class="uk-width-2-3@m uk-width-1-1@s uk-margin-remove">
+                                <div class="uk-card uk-card-default uk-card-body uk-box-shadow-large uk-text-small">
+                                    <h3 class="uk-card-title">
+                                        <b><ion-icon name="id-card-outline" size="large"></ion-icon>Datos de cuenta:</b>
+                                    </h3>
+                                    <div uk-grid class="uk-child-width-1-3">
+                                        <div>
+                                            <b>Proyecto:</b><br> {{ nxct.siguiente_cuota_pagar.proyecto }}
+                                            <br>
+                                            <b>Lote:</b><br> {{ nxct.siguiente_cuota_pagar.lote }}
+                                        </div>
+                                        <div>
+                                            <b>Fecha inicio:</b><br> {{ nxct.siguiente_cuota_pagar.fecha }}
+                                            <br>
+                                            <b>Plan de cuotas:</b><br> {{ nxct.siguiente_cuota_pagar.numcuotas }}
+                                        </div>
+                                        <div>
+                                            <b>Valor cuotas:</b><br> {{ nxct.siguiente_cuota_pagar.cuotadolar }} USD
+                                            <br>
+                                            <b>Saldo parcial:</b><br> {{ nxct.saldo_pendiente_cliente }} USD
+                                        </div>
                                     </div>
-                                    <div>
-                                        <p>Fecha inicio: {{ nxct.siguiente_cuota_pagar.fecha }}</p>
-                                        <p>Plan de cuotas: {{ nxct.siguiente_cuota_pagar.numcuotas }}</p>
-                                    </div>
-                                    <div>
-                                        <p>Valor cuotas: {{ nxct.siguiente_cuota_pagar.cuotadolar }}</p>
-                                        <p>Saldo parcial: {{ nxct.saldo_pendiente_cliente }}</p>
+                                    <hr class="uk-divider-icon">
+                                    <div class="uk-child-width-auto uk-text-small uk-flex-center" uk-grid>
+                                        <div>
+                                            <b>Pago inicial:</b><br> {{ nxct.totalVenta - nxct.totalDeuda}} USD
+                                        </div>
+                                        <div>
+                                            <b>Total de venta:</b><br> {{ nxct.totalVenta }} USD
+                                        </div>
+
+                                        <div>
+                                            <b>Total deuda:</b><br> {{ nxct.totalDeuda }} USD
+                                        </div>
+
+                                        <div>
+                                            <b>Saldo pagado:</b><br> {{ nxct.saldo_abonado }} USD
+                                        </div>
+
                                     </div>
                                 </div>
                                 <hr>
-                                <div
-                                    style="display: flex; justify-content: center; text-align:center; align-items: center; padding-bottom: 0rem;">
-                                    <h4><b>Total deuda:</b><br> {{ nxct.totalDeuda }} USD</h4>
-                                </div>
                             </div>
-                        </div>
-                        <div>
-                            {% if nxct.ultima_cuota_pagada %}
-                            <div>
-                                <div class="uk-card uk-card-default uk-card-body uk-margin-small">
-                                    <div class="uk-card-badge uk-label-success">{{ nxct.ultima_cuota_pagada.estadocuota
-                                        }}
-                                    </div>
-                                    <h3 class="uk-card-title"><b>Última cuota pagada:</b></h3>
-                                    <p>Fecha: {{ nxct.ultima_cuota_pagada.fechacuota }}</p>
-                                    <p>Monto: {{ nxct.ultima_cuota_pagada.cuotapagadadolar }} USD</p>
-                                </div>
-                            </div>
-                            {% endif %}
-                            {% if nxct.siguiente_cuota_pagar %}
-                            <div>
-                                <div class="uk-card uk-card-default uk-card-body">
-                                    <div class="uk-card-badge uk-label-{{nxct.labelColor}}">{{nxct.estado}}
-                                    </div>
-                                    <h3 class="uk-card-title"><b>Siguiente cuota a pagar:</b></h3>
-                                    <p>Fecha: {{ nxct.siguiente_cuota_pagar.fechacuota }}</p>
-                                    <p>Monto: {{ nxct.siguiente_cuota_pagar.cuotadolar }} USD</p>
-                                </div>
-                            </div>
-                            {% endif %}
-                        </div>
-                    </div>
-                    {%endif%}
-                    {%endfor%}
-                    <hr>
-                    <div>
-                        <div class="uk-width-auto@s uk-hidden@m">
-                            <!-- Botón para mostrar/ocultar la columna lateral en dispositivos pequeños -->
-                            <button class="uk-button uk-button-default uk-margin-small-right" type="button"
-                                uk-toggle="target: #tablehide; cls: uk-visible@s"><ion-icon
-                                    name="menu-outline"></ion-icon> Detalle de
-                                cuotas</button>
-                        </div>
-                        <div id="tablehide" class="uk-width-auto@m uk-visible@s">
-                            <div id="{{'tab'+id}}" style="padding-left: 0.5rem; width:90%; overflow-x: auto;">
-                                <table id="tabla-{{cliente.cliente}}"
-                                    class="uk-table uk-table-small uk-table-divider tabla-cuotas-user">
-                                    <thead>
-                                        <tr class="uk-text-small uk-margin-small">
-                                            <th>Cliente</th>
-                                            <th>Cuota</th>
-                                            <th>Fecha a pagar</th>
-                                            <th>Estado del pago</th>
-                                            <th>Monto pagado</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {% for cuota in cuotas if cuota.clienteid == id %}
-                                        <tr class="uk-text-small uk-margin-small">
-                                            <td>{{cuota.cliente}}</td>
-                                            <td>{{cuota.idcuota}}</td>
-                                            <td>{{cuota.fechacuota}}</td>
-                                            <td>{{cuota.estadocuota}}</td>
-                                            {%if cuota.cuotapagadadolar%}
-                                            <td>{{cuota.cuotapagadadolar}}</td>
-                                            {%else%}
-                                            <td></td>
-                                            {%endif%}
+                            <div class="uk-width-1-3@m uk-width-1-1@s uk-margin-remove uk-padding-remove" uk-grid>
+                                {% if nxct.ultima_cuota_pagada %}
+                                <div>
+                                    <div class="uk-card uk-card-default uk-card-body uk-box-shadow-large uk-text-small">
+                                        <div class="uk-card-badge uk-label-success">{{
+                                            nxct.ultima_cuota_pagada.estadocuota}}
+                                        </div>
+                                        <h5><b>Última cuota pagada:</b></h5>
+                                        <div class="uk-child-width-auto" uk-grid>
+                                            <div>
+                                                <b>Fecha:</b><br> {{ nxct.ultima_cuota_pagada.fechacuota }}
+                                            </div>
+                                            <div>
+                                                <b>Monto:</b><br> {{ nxct.ultima_cuota_pagada.cuotapagadadolar }} USD
+                                            </div>
 
-                                        </tr>
-                                        {%endfor%}
-                                    </tbody>
-                                </table>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endif %}
+                                {% if nxct.siguiente_cuota_pagar %}
+                                <div>
+                                    <div class="uk-card uk-card-default uk-card-body uk-box-shadow-large uk-text-small">
+                                        <div class="uk-card-badge uk-label-{{nxct.labelColor}}">{{nxct.estado}}
+                                        </div>
+                                        <h5><b>Siguiente cuota a pagar:</b></h5>
+                                        <div class="uk-child-width-auto" uk-grid>
+                                            <div>
+                                                <b>Fecha:</b><br> {{ nxct.siguiente_cuota_pagar.fechacuota }}
+                                            </div>
+                                            <div>
+                                                <b>Monto:</b><br> {{ nxct.siguiente_cuota_pagar.cuotadolar }} USD
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endif %}
                             </div>
                         </div>
-                    </div>
-                </li>
-                {%endfor%}
-                {%endfor%}
-            </ul>
+                        {%endif%}
+                        {%endfor%}
+                        <hr>
+                        <!-- Table cuotas -->
+                        <div>
+                            <div class="uk-width-auto@s uk-hidden@m">
+                                <!-- Botón para mostrar/ocultar la columna lateral en dispositivos pequeños -->
+                                <button class="uk-button uk-button-default uk-margin-small-right" type="button"
+                                    uk-toggle="target: #tablehide; cls: uk-visible@s"><ion-icon
+                                        name="menu-outline"></ion-icon> Detalle
+                                    de
+                                    cuotas</button>
+                            </div>
+                            <div id="tablehide" class="uk-width-auto@m uk-visible@s">
+                                <div id="{{'tab'+id}}" style="padding-left: 0.5rem; width:90%; overflow-x: auto;">
+                                    <table id="tabla-{{cliente.cliente}}"
+                                        class="uk-table uk-table-small uk-table-divider tabla-cuotas-user">
+                                        <thead>
+                                            <tr class="uk-text-small uk-margin-small">
+                                                <th>Cliente</th>
+                                                <th>Cuota</th>
+                                                <th>Fecha a pagar</th>
+                                                <th>Estado</th>
+                                                <th>Monto USD</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for cuota in cuotas if cuota.clienteid == id %}
+                                            <tr class="uk-text-small uk-margin-small">
+                                                <td>{{cuota.cliente}}</td>
+                                                <td>{{cuota.idcuota}}</td>
+                                                <td>{{cuota.fechacuota}}</td>
+                                                <td>{{cuota.estadocuota}}</td>
+                                                {%if cuota.cuotapagadadolar%}
+                                                <td>{{cuota.cuotapagadadolar}}</td>
+                                                {%else%}
+                                                <td></td>
+                                                {%endif%}
+
+                                            </tr>
+                                            {%endfor%}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                    {%endfor%}
+                    {%endfor%}
+                </ul>
+            </div>
         </div>
+        {%else%}
+        <div style="width: 65%; margin:auto; padding-top:1rem;">
+            <h1>
+                <span class="uk-text-background">Aún no tienes clientes registrados. Contacta al equipo SAOS para
+                    empezar a
+                    gestionar tus cobranzas.</span>
+                <hr>
+            </h1>
+        </div>
+        {%endif%}
     </div>
-    {%else%}
-    <div style="width: 65%; margin:auto; padding-top:1rem;">
-        <h1>
-            <span class="uk-text-background">Aún no tienes clientes registrados. Contacta al equipo SAOS para empezar a
-                gestionar tus cobranzas.</span>
-            <hr>
-        </h1>
-    </div>
-    {%endif%}
 </div>
 <script>
     // Configuración de DataTables

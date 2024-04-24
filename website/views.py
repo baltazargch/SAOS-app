@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, redirect, send_file
 from flask_login import login_required, current_user
 from .utils import tipo_usuario_aceptado, ultimas_cuotas, convert_to_kml
-from .models import Permit, User, Cuotas, Cobranza
+from .models import *
 from . import db
 from sqlalchemy import func, and_
 from datetime import datetime
@@ -209,66 +209,9 @@ def admin_pagos():
     
     resultados = []
     for user in usuarios:
-        # Obtener una lista de clientes únicos para el usuario actual
-        clientes = db.session.query(Cuotas.clienteid).filter_by(user_id=user.id).distinct().all()
+        userName = user.nombre + ' ' + user.apellido
+        resultados = ultimas_cuotas(user.id, userName)
         
-        # Iterar sobre cada cliente único
-        for cliente in clientes:
-            cliente = cliente[0]  # El resultado es una tupla, así que tomamos el primer elemento
-            # Obtener la última cuota pagada para el cliente actual
-            ultima_cuota_pagada = Cuotas.query\
-                .filter(and_(Cuotas.clienteid == cliente, Cuotas.estadocuota == 'Pagado', Cuotas.idcuota > 0)) \
-                                   .order_by(Cuotas.fechacuota.desc()).first()
-            
-            # Obtener la siguiente cuota a pagar para el cliente actual
-            siguiente_cuota_pagar = Cuotas.query\
-                .filter(and_(Cuotas.clienteid == cliente, Cuotas.estadocuota == 'Pendiente', Cuotas.idcuota > 0)) \
-                                     .order_by(Cuotas.fechacuota).first()
-                                                
-            # Calcular el total de cuotas y el saldo pendiente
-            total_cuotas_cliente = Cuotas.query.filter(and_(Cuotas.clienteid == cliente, Cuotas.idcuota > 0)).count()
-            
-            saldo_abonado = Cuotas.query.filter(
-                Cuotas.clienteid==cliente, 
-                Cuotas.estadocuota=='Pagado', 
-                Cuotas.idcuota > 0)\
-                    .with_entities(func.sum(Cuotas.cuotapagadadolar)) \
-                        .scalar()
-                                                
-            totalDeuda = total_cuotas_cliente * siguiente_cuota_pagar.cuotadolar #type:ignore
-            if saldo_abonado:
-                saldo_pendiente_cliente  = totalDeuda - saldo_abonado 
-            else:
-                saldo_pendiente_cliente=totalDeuda
-            
-            totalVenta = totalDeuda + db.session.query(Cuotas.cuotapagadadolar).filter_by(idcuota=0, clienteid = cliente ).scalar()
-            print(totalVenta)
-            labelColor=""
-            estado = ""
-            if siguiente_cuota_pagar.fechacuota < datetime.now().date(): #type:ignore
-                labelColor = 'danger'
-                estado = 'Vencido'
-            elif siguiente_cuota_pagar.fechacuota == datetime.now().date():  #type:ignore
-                labelColor = 'warning'
-                estado = 'Pronto'
-            else: 
-                labelColor='success'
-                estado = 'A tiempo'
-
-            # Agregar los resultados a la lista
-            resultados.append({
-                'user': user.nombre + ' ' + user.apellido,
-                'cliente': cliente,
-                'ultima_cuota_pagada': ultima_cuota_pagada,
-                'siguiente_cuota_pagar': siguiente_cuota_pagar, 
-                'saldo_pendiente_cliente': saldo_pendiente_cliente,
-                'saldo_abonado': saldo_abonado,
-                'labelColor' : labelColor, 
-                'estado':estado,
-                'totalDeuda':totalDeuda,
-                'totalVenta':totalVenta
-            })
-                                            
     return render_template('admin_pagos.html', user=current_user, cuotas=cuotas, usuarios=usuarios, 
                            ultima=resultados)
 
@@ -280,7 +223,7 @@ def user_cuotas():
         cuotas = Cuotas.query.filter_by(user_id = current_user.id).all()
         
         if cuotas:        
-            next_cuotas = ultimas_cuotas(current_user.id)
+            next_cuotas = ultimas_cuotas(current_user.id, current_user.nombre)
         
             if cuotas:
                 for cuota in cuotas:   
@@ -319,7 +262,11 @@ def admin_cashflow():
     usuarios = User.query.filter_by(tipo='user')
     if not usuarios: 
         usuarios = []
-    return render_template('admin_cashflow.html', user=current_user, cashflow=cashflow, usuarios=usuarios)
+    rubros = Rubro.query.all()
+    subrubros = Subrubro.query.all()
+    
+    return render_template('admin_cashflow.html', user=current_user, cashflow=cashflow, usuarios=usuarios, 
+                           rubros=rubros, subrubros=subrubros)
 
 @views.route('/maps_descargas/<map>')
 @login_required
