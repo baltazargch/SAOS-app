@@ -9,8 +9,7 @@
                     <fieldset class="uk-fieldset">
                         <legend class="uk-legend">Nuevo cliente Cash Flow:</legend>
                         <p class="uk-text-warning uk-text-small"> Este es un atajo para añadir clientes con permisos de
-                            Cashflow
-                            automáticamente.</p>
+                            Cashflow.</p>
                         <div class="uk-form-controls">
                             <label class="uk-form-label" for="form-stacked-text">Nombre(s)</label>
                             <input type="text" class="uk-input uk-form-small" name="nombre"
@@ -171,7 +170,8 @@
                     <div uk-grid>
                         <!-- This is the adding movements form -->
                         <div class=" uk-width-auto uk-align-center">
-                            <form action="/add_movement" method="POST" class="uk-form-stacked">
+                            <form id="formulario-movimiento" action="/add_movement" method="POST"
+                                class="uk-form-stacked">
                                 <fieldset class="uk-fieldset">
                                     <legend class="uk-legend">Nuevo movimiento:</legend>
                                     <!-- cliente y fecha -->
@@ -217,7 +217,9 @@
                                         </div>
                                         <div class="uk-form-controls">
                                             <label class="uk-form-label" for="form-stacked-text">Monto:</label>
-                                            <input class="uk-input" type="number" id="monto" name="montomov" required>
+                                            <input class="uk-input"
+                                                uk-tooltip="Use negativo para gastos, positivo para ingresos."
+                                                type="number" id="monto" name="montomov" required>
                                         </div>
 
                                         <div class="uk-form-controls">
@@ -237,7 +239,8 @@
                                     <hr>
                                     <div class="uk-form-controls">
                                         <div class="uk-flex-center" uk-grid>
-                                            <button type="submit" class="uk-button uk-button-primary">Registrar
+                                            <button type="submit" id="submit-newmov"
+                                                class="uk-button uk-button-primary">Registrar
                                                 Movimiento</button>
                                         </div>
                                     </div>
@@ -257,7 +260,7 @@
                                     user.user.apellido}}</a>
                                 <div class="uk-accordion-content">
                                     <div class="uk-overflow-auto" style="justify-content:center; width:100%;">
-                                        <table id="tabla-detalles" class="uk-table uk-table-small uk-table-divider">
+                                        <table class="uk-table uk-table-small uk-table-divider tabla-detalles">
                                             <thead>
                                                 <tr class="uk-text-small uk-margin-small uk-padding-small">
                                                     <th>id</th>
@@ -309,10 +312,60 @@
             </ul>
         </div>
     </div>
+    <!-- Modal -->
+    <div id="modal-confirmacion" uk-modal>
+        <div class="uk-modal-dialog uk-modal-body">
+            <h2 class="uk-modal-title">Confirmar tipo de movimiento</h2>
+            <p id="mensaje"></p>
+            <p class="uk-text-right">
+                <button class="uk-button uk-button-default uk-modal-close" type="button">Cancelar</button>
+                <button class="uk-button uk-button-primary" type="button" id="btn-continuar">Confirmar</button>
+            </p>
+        </div>
+    </div>
 </div>
 <script>
 
     const btnDelete = document.querySelectorAll('.delete-rubro');
+    const btnMovement = document.getElementById('submit-newmov');
+
+    if (btnMovement) {
+        // Agregar evento click al botón
+        btnMovement.addEventListener('click', (e) => {
+            // Detener el comportamiento por defecto del botón
+            e.preventDefault();
+
+            // Obtener el valor del monto
+            const montoInput = document.getElementById('monto');
+            const monto = parseFloat(montoInput.value);
+
+            // Determinar el tipo de monto
+            const tipoMonto = monto >= 0 ? 'ingreso' : 'gasto';
+
+            // Crear el mensaje de confirmación
+            const mensaje = `Estás por registrar un movimiento de ${tipoMonto}. ¿Estás seguro?`;
+
+            // Mostrar el modal de confirmación con el mensaje
+            UIkit.modal('#modal-confirmacion').show();
+
+            // Establecer el texto del mensaje en el modal
+            const mensajeElement = document.getElementById('mensaje');
+            mensajeElement.textContent = mensaje;
+
+            // Agregar clase para cambiar el color del texto según el tipo de monto
+            if (tipoMonto === 'ingreso') {
+                mensajeElement.classList.add('uk-text-success');
+            } else {
+                mensajeElement.classList.add('uk-text-danger');
+            }
+
+            // Agregar evento click al botón de continuar
+            document.getElementById('btn-continuar').addEventListener('click', () => {
+                // Continuar con el envío del formulario
+                document.getElementById('formulario-movimiento').submit();
+            });
+        });
+    };
 
     if (btnDelete) {
         arrayDelete = Array.from(btnDelete);
@@ -345,6 +398,15 @@
             searching: true, // Ocultar barra de búsqueda
             info: false, // Ocultar información de la tabla
             ordering: false, // Desactivar ordenamiento de columnas
+        });
+
+        var tabledetalles = $(".tabla-detalles").DataTable({
+            searching: false,
+            paging: true,
+            pageLength: 7, // Número de filas por página
+            lengthChange: false, // Ocultar selector de cantidad de filas por página
+            info: false, // Ocultar información de la tabla
+            ordering: true, // Desactivar ordenamiento de columnas
         });
     });
 
