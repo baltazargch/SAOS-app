@@ -5,13 +5,6 @@ from sqlalchemy import CheckConstraint, Date
 import calendar
 from datetime import datetime
 
-# Funcs to make column month year
-mes_actual = datetime.now().strftime("%B")  # Obtener el nombre del mes actual en inglés
-mes_actual_espanol = calendar.month_name[int(datetime.now().strftime("%m"))]  # Traducir el nombre del mes al español
-anio_actual = datetime.now().strftime("%Y")  # Obtener el año actual
-
-mes_y_anio = f"{mes_actual_espanol.capitalize()} {anio_actual}"
-
 # GENERAL DATA
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
@@ -70,11 +63,11 @@ class Cobranza(db.Model):
 # CASH FLOW
 class Cashflow(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    fecha = db.Column(db.DateTime(timezone=True), default=func.now())
-    mesanio = db.Column(db.String(20), default=mes_y_anio)
+    fecha = db.Column(db.DateTime(timezone=True))
+    mesanio = db.Column(db.String(20))
     subrubro_id = db.Column(db.Integer, db.ForeignKey('subrubro.id'), nullable=False)
-    montousd = db.Column(db.Float, nullable=False)
-    montoarg = db.Column(db.Float, nullable=False)
+    montousd = db.Column(db.Float)
+    montoarg = db.Column(db.Float)
     descripcion = db.Column(db.String(255))
     empresa = db.Column(db.String(250))
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)

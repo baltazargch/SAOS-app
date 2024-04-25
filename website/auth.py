@@ -104,12 +104,6 @@ def new_user():
         elif len(str(password1)) < 4:
             flash("La contraseña debe contener más de 4 caracteres.",  category="error")
         else:
-            """ new_user = User(email=emailTested.normalized,
-                        nombre=nombre,
-                        apellido=apellido,
-                        tipo=tipo,
-                        password= generate_password_hash(password1,  method='pbkdf2')) # type: ignore """
-            
             new_user_const(
                 email=emailTested.normalized, 
                 password=generate_password_hash(str(password1),  method='pbkdf2'), 
@@ -197,3 +191,44 @@ def edit_permits():
             flash("Permisos cambiados correctamente!",  category="success")
     return redirect('/sing_up?tab=permisos')
 
+@auth.route("/new_cashflow", methods=['POST'])
+@tipo_usuario_aceptado('admin')
+def new_cashflow():
+    if request.method == 'POST':
+        email = request.form.get('email')
+        nombre = request.form.get('nombre')
+        apellido = request.form.get('apellido')
+        password1 = request.form.get('password1')
+        password2 = request.form.get('password2')
+        tipo = 'user'
+        
+        user = User.query.filter_by(email = email).first()
+        
+        try:
+            emailTested = validate_email(str(email))
+        except EmailNotValidError as erroremail:
+            flash(str(erroremail),  category="error")
+            
+        if user:
+            flash('El email ingresado ya se encuentra registrado.', category='error')
+        elif len(str(nombre)) < 2: 
+            flash("Nombre debe contener más de 2 caracteres.",  category="error")
+        elif len(str(apellido)) < 2:
+            flash("Apellido debe contener más de 2 caracteres.",  category="error")
+        elif password1 != password2:
+            flash("Las contraseñas no coinciden. Por favor revise e intente nuevamente.",  category="error")
+        elif len(str(password1)) < 4:
+            flash("La contraseña debe contener más de 4 caracteres.",  category="error")
+        else:
+            new_user_const(
+                email=emailTested.normalized, 
+                password=generate_password_hash(str(password1),  method='pbkdf2'), 
+                nombre=nombre,
+                apellido=apellido,
+                tipo=tipo,
+                mapas='No',
+                loteos='No', 
+                construccion='Si')
+            
+            flash("¡Cuenta con permisos de Cashflow creada correctamente!",  category="success")
+    return redirect('/cashflow')

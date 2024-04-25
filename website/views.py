@@ -256,17 +256,26 @@ def user_cuotas():
 @login_required
 @tipo_usuario_aceptado('admin')
 def admin_cashflow():
-    cashflow = Cuotas.query.all()
+    cashflow = Cashflow.query.all()
     if not cashflow: 
         cashflow = []
-    usuarios = User.query.filter_by(tipo='user')
+    else: 
+        for c in cashflow:
+            c.fecha = c.fecha.date()
+            if c.montousd == None:
+                c.montousd = 0
+            if c.montoarg == None:
+                c.montoarg = 0
+            
+    usuarios = Permit.query.filter_by(construccion='Si').all()
     if not usuarios: 
         usuarios = []
+        
     rubros = Rubro.query.all()
     subrubros = Subrubro.query.all()
-    
+    subJS = [{'id': subrubro.id, 'nombre': subrubro.nombre, 'rubro_id': subrubro.rubro_id} for subrubro in subrubros]
     return render_template('admin_cashflow.html', user=current_user, cashflow=cashflow, usuarios=usuarios, 
-                           rubros=rubros, subrubros=subrubros)
+                           rubros=rubros, subrubros=subrubros, subJS=subJS)
 
 @views.route('/maps_descargas/<map>')
 @login_required

@@ -294,3 +294,27 @@ def convert_to_kml(filemap):
     kml_data += '</kml>\n'
         
     return kml_data
+
+def mesanio(date):
+    # Funcs to make column month year
+    nombres_meses = {
+        1: "Enero",
+        2: "Febrero",
+        3: "Marzo",
+        4: "Abril",
+        5: "Mayo",
+        6: "Junio",
+        7: "Julio",
+        8: "Agosto",
+        9: "Septiembre",
+        10: "Octubre",
+        11: "Noviembre",
+        12: "Diciembre"
+    }
+    # Obtener el nombre del mes y el año
+    mes_actual = nombres_meses[int(date.strftime("%m"))]  # Obtener el nombre del mes en español
+    anio_actual = datetime.now().strftime("%Y")  # Obtener el año actual
+
+    mes_y_anio = f"{mes_actual.capitalize()} {anio_actual}"
+    
+    return mes_y_anio

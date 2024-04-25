@@ -3,40 +3,43 @@
 {% block main_content %}
 <div style="padding-top:1rem; width: 85%;margin: auto;">
     <div uk-grid>
-        <div class="uk-width-auto">
+        <div class="uk-width-1-4">
             <div style="border-right: 1px solid rgba(0,0,0,0.2); padding-right:1rem;">
                 <form action="new_cashflow" method='POST'>
                     <fieldset class="uk-fieldset">
                         <legend class="uk-legend">Nuevo cliente Cash Flow:</legend>
+                        <p class="uk-text-warning uk-text-small"> Este es un atajo para añadir clientes con permisos de
+                            Cashflow
+                            automáticamente.</p>
                         <div class="uk-form-controls">
                             <label class="uk-form-label" for="form-stacked-text">Nombre(s)</label>
                             <input type="text" class="uk-input uk-form-small" name="nombre"
-                                placeholder="Ingrese nombre(s)">
+                                placeholder="Ingrese nombre(s)" required>
                         </div>
 
                         <div class="uk-form-controls">
                             <label class="uk-form-label" for="form-stacked-text">Apellido(s)</label>
                             <input type="text" class="uk-input uk-form-small" name="apellido"
-                                placeholder="Ingrese apellido(s)">
+                                placeholder="Ingrese apellido(s)" required>
                         </div>
 
                         <div class="uk-form-controls">
                             <label class="uk-form-label" for="form-stacked-text">Email</label>
                             <input type="email" class="uk-input uk-form-small" name="email"
-                                placeholder="Ingrese correo electrónico">
+                                placeholder="Ingrese correo electrónico" required>
                         </div>
                         <br>
 
                         <div class="uk-form-controls">
                             <label class="uk-form-label" for="form-stacked-text">Contraseña</label>
                             <input type="password" class="uk-input uk-form-small" name="password1"
-                                placeholder="Ingrese contraseña segura">
+                                placeholder="Ingrese contraseña segura" required>
                         </div>
 
                         <div class="uk-form-controls">
                             <label class="uk-form-label" for="form-stacked-text">Confirmar contraseña</label>
                             <input type="password" class="uk-input uk-form-small" name="password2"
-                                placeholder="Repita contraseña segura">
+                                placeholder="Repita contraseña segura" required>
                         </div>
                         <br />
                     </fieldset>
@@ -49,8 +52,10 @@
             <ul uk-tab>
                 <li class="uk-active"><a href="">Rubros</a></li>
                 <li><a href="">Movimientos</a></li>
+                <li><a href="">Detalle</a></li>
             </ul>
             <ul class="uk-switcher uk-margin">
+                <!-- contenido rubros -->
                 <li>
                     <div uk-grid>
                         <div class="uk-width-auto">
@@ -95,9 +100,6 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                            {%for sub in subrubros%}
-                                            {{sub.nombre}}
-                                            {%endfor%}
                                             <div class="uk-form-controls">
                                                 <div class="uk-margin">
                                                     <div class="uk-form-controls">
@@ -119,7 +121,7 @@
                             <div class="uk-overflow-auto" style="justify-content:center; width:100%;">
                                 <table id="tabla-rubros" class="uk-table uk-table-small uk-table-divider">
                                     <thead>
-                                        <tr>
+                                        <tr class="uk-text-small uk-margin-small uk-padding-small">
                                             <th>Rubro</th>
                                             <th>Eliminar</th>
                                             <th>Subrurbos</th>
@@ -128,9 +130,10 @@
                                     </thead>
                                     <tbody>
                                         {%for rub in rubros %}
-
-                                        <tr>
-                                            <td>{{rub.nombre}}</td>
+                                        {%for sub in subrubros%}
+                                        {%if rub.id == sub.rubro_id %}
+                                        <tr class="uk-text-small uk-margin-small uk-padding-small">
+                                            <td>{{rub.nombre }} </td>
                                             <td>
                                                 <div style="display:flex; justify-content: center;">
                                                     <a href="/delete_rubro/rubro/{{ rub.id }}">
@@ -140,10 +143,9 @@
                                                     </a>
                                                 </div>
                                             </td>
-                                            {%for sub in subrubros%}
-                                            {%if sub.rubro_id == rub.id %}
-                                            <td>{{sub.nombre}}</td>
 
+
+                                            <td>{{sub.nombre}}</td>
                                             <td>
                                                 <div style="display:flex; justify-content: center;">
                                                     <a href="/delete_rubro/subrubro/{{ sub.id }}">
@@ -156,68 +158,152 @@
                                             {%endif%}
                                             {%endfor%}
                                         </tr>
-
                                         {%endfor%}
+
                                     </tbody>
                                 </table>
                             </div>
                         </div>
                     </div>
                 </li>
+                <!-- contenido movimientos nuevos -->
                 <li>
-                    <div>
-                        <div class=" uk-width-auto" uk-grid>
-                            <form action="" method="POST">
+                    <div uk-grid>
+                        <!-- This is the adding movements form -->
+                        <div class=" uk-width-auto uk-align-center">
+                            <form action="/add_movement" method="POST" class="uk-form-stacked">
                                 <fieldset class="uk-fieldset">
-                                    <div class="uk-form-controls">
-                                        <div class="uk-margin">
-                                            <div class="uk-form-controls">
-                                                <label for="rubro">Rubro:</label>
-                                                <select id="rubro" name="rubro" required>
-                                            </div>
+                                    <legend class="uk-legend">Nuevo movimiento:</legend>
+                                    <!-- cliente y fecha -->
+                                    <div class="uk-child-width-1-2" uk-grid>
+                                        <div class="uk-form-controls">
+                                            <label class="uk-form-label" for="form-stacked-text">Cliente:</label>
+                                            <select class="uk-select" id="clientemov" name="clientemov" required>
+                                                {%for user in usuarios %}
+                                                <option value="{{user.user_id}}">{{user.user.nombre + ' ' +
+                                                    user.user.apellido}}
+                                                </option>
+                                                {%endfor%}
+                                            </select>
+                                        </div>
+                                        <div class="uk-form-controls">
+                                            <label class="uk-form-label" for="form-stacked-text">Fecha:</label>
+                                            <input class="uk-input" type="date" id="fecha" name="fechamov" required>
                                         </div>
                                     </div>
-                                    <div class="uk-form-controls">
-                                        <div class="uk-margin">
-                                            <div class="uk-form-controls">
-                                                </select>
+                                    <!-- rubro y subrubro -->
+                                    <div class="uk-child-width-1-2" uk-grid>
+                                        <div class="uk-form-controls">
+                                            <label class="uk-form-label" for="form-stacked-text">Rubro:</label>
+                                            <select class="uk-select" id="rubromov" name="rubromov" required>
+                                                {%for rub in rubros %}
+                                                <option value="{{rub.id}}">{{rub.nombre}}</option>
+                                                {%endfor%}
+                                            </select>
+                                        </div>
 
-                                                <label for="subrubro">Subrubro:</label>
-                                                <select id="subrubro" name="subrubro" required>
+                                        <div class="uk-form-controls">
+                                            <label class="uk-form-label" for="form-stacked-text">Subrubro:</label>
+                                            <select class="uk-select" id="subrubromov" name="subrubromov" required>
+                                                <!-- to be filled programatically in script -->
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <!-- empresa monto y currency -->
+                                    <div class="uk-child-width-1-3" uk-grid>
+                                        <div class="uk-form-controls">
+                                            <label class="uk-form-label" for="form-stacked-text">Empresa:</label>
+                                            <input class="uk-input" type="text" id="empresa" name="empresamov" required>
+                                        </div>
+                                        <div class="uk-form-controls">
+                                            <label class="uk-form-label" for="form-stacked-text">Monto:</label>
+                                            <input class="uk-input" type="number" id="monto" name="montomov" required>
+                                        </div>
 
-                                                </select>
-                                            </div>
+                                        <div class="uk-form-controls">
+                                            <label class="uk-form-label" for="form-stacked-select">Moneda:</label>
+                                            <select class="uk-select" id="monedamov" name="monedamov">
+                                                <option value="usd" selected>USD</option>
+                                                <option value="ars">ARS</option>
+                                            </select>
                                         </div>
+
                                     </div>
+                                    <!-- detalles -->
                                     <div class="uk-form-controls">
-                                        <div class="uk-margin">
-                                            <div class="uk-form-controls">
-                                                <label for="monto">Monto:</label>
-                                                <input type="number" id="monto" name="monto" required>
-                                            </div>
-                                        </div>
+                                        <label class="uk-form-label" for="form-stacked-text">Descripción:</label>
+                                        <textarea class="uk-textarea" id="descripcion" name="detallemov"></textarea>
                                     </div>
+                                    <hr>
                                     <div class="uk-form-controls">
-                                        <div class="uk-margin">
-                                            <div class="uk-form-controls">
-                                                <label for="fecha">Fecha:</label>
-                                                <input type="date" id="fecha" name="fecha" required>
-                                            </div>
+                                        <div class="uk-flex-center" uk-grid>
+                                            <button type="submit" class="uk-button uk-button-primary">Registrar
+                                                Movimiento</button>
                                         </div>
                                     </div>
-                                    <div class="uk-form-controls">
-                                        <div class="uk-margin">
-                                            <div class="uk-form-controls">
-                                                <label for="descripcion">Descripción:</label>
-                                                <textarea id="descripcion" name="descripcion"></textarea>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <button type="submit">Registrar
-                                        Movimiento</button>
                                 </fieldset>
                             </form>
                         </div>
+                    </div>
+                </li>
+                <!-- contenido detalles -->
+                <li>
+                    <!-- This is the details of each client of cahsflow movements -->
+                    <div class=" uk-width-expand">
+                        <ul uk-accordion>
+                            {%for user in usuarios%}
+                            <li>
+                                <a class="uk-accordion-title" href>{{user.user.nombre + ' ' +
+                                    user.user.apellido}}</a>
+                                <div class="uk-accordion-content">
+                                    <div class="uk-overflow-auto" style="justify-content:center; width:100%;">
+                                        <table id="tabla-detalles" class="uk-table uk-table-small uk-table-divider">
+                                            <thead>
+                                                <tr class="uk-text-small uk-margin-small uk-padding-small">
+                                                    <th>id</th>
+                                                    <th>Fecha</th>
+                                                    <th>Mes</th>
+                                                    <th>Rubro</th>
+                                                    <th>Subrubro</th>
+                                                    <th>Empresa</th>
+                                                    <th>Detalle</th>
+                                                    <th>Monto USD</th>
+                                                    <th>Monto ARS</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {%for cash in cashflow %}
+                                                {% if cash.user_id == user.user_id%}
+                                                <tr class="uk-text-small uk-margin-small uk-padding-small">
+                                                    <td>{{cash.id}} </td>
+                                                    <td>{{cash.fecha}} </td>
+                                                    <td>{{cash.mesanio}} </td>
+                                                    {%for rub in rubros%}
+                                                    {%for subr in rub.subrubros %}
+                                                    {% if subr.id == cash.subrubro_id%}
+                                                    <td>{{rub.nombre}}</td>
+                                                    <td>{{subr.nombre}} </td>
+                                                    {%endif%}
+                                                    {%endfor%}
+                                                    {%endfor%}
+                                                    <td>{{cash.empresa}} </td>
+                                                    <td>{{cash.descripcion}} </td>
+                                                    <td
+                                                        class="{%if cash.montousd > 0%} uk-text-success {%elif  cash.montousd < 0%} uk-text-danger {%endif%}">
+                                                        {{cash.montousd}} </td>
+                                                    <td
+                                                        class="{%if cash.montoarg > 0%} uk-text-success {%elif  cash.montoarg < 0%} uk-text-danger {%endif%}">
+                                                        {{cash.montoarg}} </td>
+                                                </tr>
+                                                {%endif%}
+                                                {%endfor%}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </li>
+                            {%endfor%}
+                        </ul>
                     </div>
                 </li>
             </ul>
@@ -232,12 +318,64 @@
         arrayDelete = Array.from(btnDelete);
         arrayDelete.forEach((btn) => {
             btn.addEventListener('click', (e) => {
-                if (!confirm('¿Estás seguro de que quieres eliminar este (sub)rubro?')) {
+                if (!confirm('¿Estás seguro de que quieres eliminar este(sub)rubro ? si es un subrubro, y es el único del rubro, seguirá existiendo el rubro pero no se mostrará en la tabla hasta que le sea asignado un nuevo subrubro.')) {
                     e.preventDefault();
                 }
             });
         });
     };
 
+    $(document).ready(function () {
+        // Inicializar DataTables
+        var table = $("#tabla-rubros").DataTable({
+            // Configuración de paginación
+            columnDefs: [
+                {
+                    targets: [0, 2],
+                    searchable: true
+                },
+                {
+                    targets: [1, 3],
+                    searchable: false
+                }
+            ],
+            paging: true,
+            pageLength: 10, // Número de filas por página
+            lengthChange: false, // Ocultar selector de cantidad de filas por página
+            searching: true, // Ocultar barra de búsqueda
+            info: false, // Ocultar información de la tabla
+            ordering: false, // Desactivar ordenamiento de columnas
+        });
+    });
+
+    // Obtener referencia al campo de selección de rubros y subrubros
+    const rubroSelect = document.getElementById('rubromov');
+    const subrubroSelect = document.getElementById('subrubromov');
+    const subrubs = {{ subJS | tojson | safe }};
+
+    // Obtener los subrubros disponibles para el rubro seleccionado
+    function actualizarSubrubros() {
+        const rubroId = rubroSelect.value;
+
+        // Filtrar los subrubros según el rubroId
+        const subrubros = subrubs.filter(subrubro => subrubro.rubro_id === parseInt(rubroId));
+
+        // Limpiar las opciones actuales del campo de selección de subrubros
+        subrubroSelect.innerHTML = '';
+
+        // Agregar las nuevas opciones basadas en los subrubros filtrados
+        subrubros.forEach(subrubro => {//ignore error
+            const option = document.createElement('option');
+            option.value = subrubro.id;
+            option.textContent = subrubro.nombre;
+            subrubroSelect.appendChild(option);
+        });
+    };
+
+    // Agregar evento change al campo de selección de rubros
+    rubroSelect.addEventListener('change', actualizarSubrubros);
+
+    // Llamar a la función para asegurarse de que los subrubros estén actualizados inicialmente
+    actualizarSubrubros();
 </script>
 {%endblock%}

@@ -1,8 +1,8 @@
-from flask import Blueprint, render_template, request, flash, redirect, url_for, Response
+from flask import Blueprint, render_template, request, flash, redirect, url_for, Response, jsonify
 from .models import *
 from . import db
 from flask_login import login_required, current_user
-from .utils import tipo_usuario_aceptado, crear_cuotas_usuario, generar_csv_cuotas
+from .utils import tipo_usuario_aceptado, crear_cuotas_usuario, generar_csv_cuotas, mesanio
 from datetime import datetime
 import os
 import json
@@ -390,3 +390,42 @@ def delete_subrubro(tipo, id):
             db.session.commit()
             flash('Subrubro eliminado correctamente.', 'success')
     return redirect(url_for('views.admin_cashflow'))
+
+@manager.route('/add_movement', methods=['POST'])
+@login_required
+@tipo_usuario_aceptado('admin')
+def add_movement():
+    if request.method == 'POST':
+        clienteid = request.form.get('clientemov')
+        fecha_str = request.form.get('fechamov')
+        fecha = datetime.strptime(fecha_str, '%Y-%m-%d') #type:ignore
+        subrubro = request.form.get('subrubromov')
+        empresa = request.form.get('empresamov')
+        monto = request.form.get('montomov')
+        moneda = request.form.get('monedamov')
+        detalle = request.form.get('detallemov')
+        colmesanio = mesanio(fecha)
+
+        if moneda == 'usd':
+            montousd = monto
+            montoarg = None
+        if moneda == 'ars': 
+            montoarg = monto
+            montousd = None
+            
+        nuevo_mov = Cashflow(
+            fecha = fecha,
+            mesanio = colmesanio,
+            subrubro_id = subrubro,
+            montousd = montousd,
+            montoarg = montoarg,
+            descripcion = detalle,
+            empresa = empresa,
+            user_id = clienteid,
+        ) #type: ignore
+        
+        db.session.add(nuevo_mov)
+        db.session.commit()
+        flash('¡Nuevo movimiento creado!', 'sucess')
+         
+    return redirect('/cashflow?clicktab=movimientos')
