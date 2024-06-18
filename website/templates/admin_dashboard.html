@@ -11,6 +11,7 @@
     </div>
     <hr class="uk-divider-icon">
     <div class="uk-container uk-container-small uk-position-relative uk-text-small uk-margin-small uk-padding-small">
+        {% if current_user.tipo == 'superadmin' %}
         <h4 class="uk-heading-line"><span>Usuarios y Permisos</span></h4>
         <p class="'uk-text-justify"> Acceda y administre los diferentes usuarios y permisos de SAOS.</p>
         <div class="uk-child-width-auto uk-text-center admin__dash" uk-grid="masonry: pack" style="font-size: smaller;">
@@ -29,9 +30,11 @@
                 </a>
             </div>
         </div>
+        {% endif %}
         <h4 class="uk-heading-line"><span>Cobranzas y Pagos</span></h4>
         <p class="'uk-text-justify"> Genere nuevos planes de cobranza y registre pagos de los clientes activos.</p>
         <div class="uk-child-width-auto uk-text-center admin__dash" uk-grid="masonry: pack" style="font-size: smaller;">
+            {% if current_user.tipo == 'superadmin' %}
             <div>
                 <a href="/admincuotas">
                     <div class="uk-card uk-card-hover uk-margin-small">
@@ -46,6 +49,7 @@
                     </div>
                 </a>
             </div>
+            {% endif %}
             <div>
                 <a href="/admin_pagos">
                     <div class="uk-card uk-card-hover uk-margin-small">
@@ -61,6 +65,7 @@
                 </a>
             </div>
         </div>
+        {% if current_user.tipo == 'superadmin' %}
         <h4 class="uk-heading-line"><span>Cash flow</span></h4>
         <p class="'uk-text-justify"> Genere nuevos usuarios de Cash Flow y registre movimientos de los clientes activos.
         </p>
@@ -80,6 +85,7 @@
                 </a>
             </div>
         </div>
+        {% endif%}
         <h4 class="uk-heading-line"><span>Loteos</span></h4>
         <p class="'uk-text-justify"> Acceda a los loteos, modifique los estados e imprima estados generales.</p>
         <div class="uk-child-width-auto uk-text-center admin__dash" uk-grid="masonry: pack" style="font-size: smaller;">

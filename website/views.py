@@ -25,9 +25,14 @@ def maps_admin():
     mapdir = os.path.join(os.path.dirname(__file__), 'static', 'maps')
     files = os.listdir(mapdir)
     
+    mappermits_values = {}
+    for permit in current_user.permits:
+        mappermits_values = permit.mappermits
+        
     def obtener_fecha(x):
         return datetime.strptime(x['properties']['fecha'], '%Y-%m-%d')
         
+    files = [file for file in files if file.replace('.geojson', '') in mappermits_values]
     centroides = []
     estados = []
     datos = []
@@ -135,7 +140,7 @@ def maps_users():
 
 @views.route('/dashboard')
 @login_required
-@tipo_usuario_aceptado({'user', 'admin'})
+@tipo_usuario_aceptado({'user', 'admin', 'superadmin'})
 def dashboard():
     if current_user.is_authenticated:
         id = current_user.id
@@ -163,13 +168,13 @@ def dashboard():
 
 @views.route('/admindashboard')
 @login_required
-@tipo_usuario_aceptado('admin')
+@tipo_usuario_aceptado({'admin', 'superadmin'})
 def admindashboard():
     return render_template('admin_dashboard.html', user=current_user)
 
 @views.route('/admincuotas')
 @login_required
-@tipo_usuario_aceptado('admin')
+@tipo_usuario_aceptado('superadmin')
 def admincuotas():
     if current_user.is_authenticated:
         # Consulta para obtener los usuarios que tienen loteos = 'Si'
@@ -192,26 +197,33 @@ def admincuotas():
 
 @views.route('/admin_descargas', methods=['GET'])
 @login_required
-@tipo_usuario_aceptado('admin')
+@tipo_usuario_aceptado({'admin', 'superadmin'})
 def admin_descargas():
     mapdir = os.path.join(os.path.dirname(__file__), 'static', 'maps')
     files = os.listdir(mapdir)
     
+    mappermits_values = {}
+    for permit in current_user.permits:
+        mappermits_values = permit.mappermits
+        
+    if current_user.permits != 'superadmin':
+        files = [file for file in files if file.replace('.geojson', '') in mappermits_values]
+        
     return render_template('admin_descargas.html', user=current_user, files=files)
 
 @views.route('/admin_pagos', methods=['GET'])
 @login_required
-@tipo_usuario_aceptado('admin')
+@tipo_usuario_aceptado({'admin','superadmin'})
 def admin_pagos():
     
     cuotas = Cuotas.query.all()
-    usuarios = User.query.filter_by(tipo='user')
+    usuarios = User.query.filter(User.tipo.in_(['user', 'admin'])).all()
     
     resultados = []
     for user in usuarios:
         userName = user.nombre + ' ' + user.apellido
-        resultados = ultimas_cuotas(user.id, userName)
-        
+        resultados.append(ultimas_cuotas(user.id, userName))
+    
     return render_template('admin_pagos.html', user=current_user, cuotas=cuotas, usuarios=usuarios, 
                            ultima=resultados)
 
@@ -254,7 +266,7 @@ def user_cuotas():
 
 @views.route('/cashflow', methods=['GET', 'POST'])
 @login_required
-@tipo_usuario_aceptado('admin')
+@tipo_usuario_aceptado('superadmin')
 def admin_cashflow():
     cashflow = Cashflow.query.all()
     if not cashflow: 
@@ -279,7 +291,7 @@ def admin_cashflow():
 
 @views.route('/maps_descargas/<map>')
 @login_required
-@tipo_usuario_aceptado('admin')
+@tipo_usuario_aceptado({'admin', 'superadmin'})
 def maps_descargas(map):
     if map: 
         filemap = os.path.join(os.path.dirname(__file__), 'static', 'maps', map)

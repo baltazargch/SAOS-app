@@ -51,7 +51,7 @@ def create_app():
                 new_user = User(email='info@saos.app',
                             nombre='saos',
                             apellido='saos',
-                            tipo="admin",
+                            tipo="superadmin",
                             password = generate_password_hash('1234',  method='pbkdf2')) # type: ignore
                 
                 db.session.add(new_user)

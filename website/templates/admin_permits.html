@@ -130,7 +130,7 @@
                             <tbody>
                                 {%if permitsUser != ''%}
                                 {%for permUser in permitsUser%}
-                                {%if permUser.user.tipo == 'user'%}
+                                {%if permUser.user.tipo != 'superadmin'%}
                                 <tr>
                                     <form action="edit_permits" method="POST">
                                         <td> {{ permUser.user.nombre }} </td>

@@ -57,7 +57,7 @@
 
                 <div class="uk-navbar-right">
                     <ul class="uk-navbar-nav">
-                        {% if user.tipo == 'admin' %}
+                        {% if user.tipo != 'user' %}
                         <li> <a href="/admindashboard">Admin SAOS</a> </li>
                         <li><a href="/logout">Salir<ion-icon name="log-out-outline"></ion-icon></a></li>
                         {%elif user.is_authenticated%}

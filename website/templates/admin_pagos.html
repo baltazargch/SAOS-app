@@ -10,12 +10,14 @@
                     <li class="uk-parent">
                         <a href> {{ us.nombre + ' ' + us.apellido }} <span uk-nav-parent-icon></span></a>
                         <ul class="uk-nav-sub">
-                            {%for ult in ultima %}
+                            {%for ulti in ultima %}
+                            {%for ult in ulti %}
                             {%if ult.user == us.nombre + ' ' + us.apellido %}
                             <li><a href="#" onclick="showPanel('{{ ult.cliente.replace(' ','-') }}')">
                                     {{ult.siguiente_cuota_pagar.cliente + ' ' + ult.siguiente_cuota_pagar.lote }}
                                 </a></li>
                             {%endif%}
+                            {%endfor%}
                             {%endfor%}
                         </ul>
                     </li>
@@ -24,7 +26,8 @@
             </div>
             <div class="uk-width-expand" id="cuotas-content" style="border-left:1px solid rgba(128, 128, 128, 0.312);">
                 {%for us in usuarios %}
-                {%for ult in ultima %}
+                {%for ulti in ultima %}
+                {%for ult in ulti %}
                 {%if ult.user == us.nombre + ' ' + us.apellido %}
                 <div id="{{ ult.cliente.replace(' ', '-') }}">
                     <h3 class="uk-heading-bullet uk-font-default">
@@ -144,11 +147,13 @@
                 {%endif%}
                 {%endfor%}
                 {%endfor%}
+                {%endfor%}
             </div>
         </div>
         <!-- Modals for each payment -->
         <div>
-            {%for ult in ultima %}
+            {%for ulti in ultima %}
+            {%for ult in ulti %}
             <div id="{{ult.cliente.replace(' ', '-')}}" uk-modal>
                 <div class="uk-modal-dialog">
                     <button class="uk-modal-close-default" type="button" uk-close></button>
@@ -218,7 +223,9 @@
                 </div>
             </div>
             {%endfor%}
+            {%endfor%}
         </div>
+
     </div>
 </div>
 <script>

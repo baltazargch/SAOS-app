@@ -15,7 +15,7 @@ manager = Blueprint('manager', __name__)
 
 @manager.route('/nuevo_cliente', methods=['POST'])
 @login_required
-@tipo_usuario_aceptado('admin')
+@tipo_usuario_aceptado('superadmin')
 def nuevo_cliente():
     if request.method == 'POST':
         id = request.form.get('userLotes')
@@ -52,7 +52,7 @@ def nuevo_cliente():
 
 @manager.route('/descargar_csv', methods=['POST'])
 @login_required
-@tipo_usuario_aceptado('admin')
+@tipo_usuario_aceptado(['admin', 'superadmin'])
 def descargar_csv_cuotas():
     fecha_actual = datetime.now().strftime('%Y-%m-%d')
     # Generamos el contenido del CSV de las cuotas
@@ -66,7 +66,7 @@ def descargar_csv_cuotas():
 
 @manager.route('/registrar_pago/<clienteid>/<cuota>', methods=['POST']) #type: ignore
 @login_required
-@tipo_usuario_aceptado('admin')
+@tipo_usuario_aceptado(['admin', 'superadmin'])
 def registrar_pago(clienteid, cuota):
     if request.method == 'POST':
         pagado = request.form.get('pagodolares')
@@ -81,7 +81,7 @@ def registrar_pago(clienteid, cuota):
 
 @manager.route('/set_maps_permits/<id>', methods=['POST'])
 @login_required
-@tipo_usuario_aceptado('admin')
+@tipo_usuario_aceptado('superadmin')
 def set_maps_permits(id):
     if request.method == 'POST':
         userDb = Permit.query.get(id)
@@ -116,7 +116,7 @@ def delete_cobranza(id):
 # Esta función sirve para agregar proyectos de cobranzas y poder asignar plan de cuotas a los usuarios
 @manager.route('/add_cobranza', methods=['POST'])
 @login_required
-@tipo_usuario_aceptado('admin')
+@tipo_usuario_aceptado('superadmin')
 def add_cobranza():
     if request.method == 'POST':
         newproyect = request.form.get('proyect')
@@ -339,7 +339,7 @@ def print_cobranzas(id):
 
 @manager.route('/agregar_rubro/<tipo>', methods=['POST'])
 @login_required
-@tipo_usuario_aceptado('admin')
+@tipo_usuario_aceptado('superadmin')
 def agregar_rubros(tipo):
     if request.method == 'POST':
         if tipo == 'rubro': 
@@ -374,7 +374,7 @@ def agregar_rubros(tipo):
 
 @manager.route('/delete_rubro/<tipo>/<string:id>', methods=['GET'])
 @login_required
-@tipo_usuario_aceptado('admin')
+@tipo_usuario_aceptado('superadmin')
 def delete_subrubro(tipo, id):
     if tipo == 'rubro':
         rubro = Rubro.query.filter_by(id = id).first()

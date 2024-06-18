@@ -16,7 +16,7 @@ auth = Blueprint('auth', __name__)
 def login():
     
     if current_user.is_authenticated:
-        if current_user.tipo == 'admin':
+        if current_user.tipo in ['admin', 'superadmin']:
             return redirect(url_for('views.admindashboard'))
         else:
             return redirect(url_for('views.dashboard'))
@@ -30,7 +30,7 @@ def login():
             if check_password_hash(user.password, password): # type: ignore
                 flash('Acceso al sistema exitoso.', category='success')
                 login_user(user, remember=True)
-                if user.tipo == 'admin':
+                if user.tipo in ['admin', 'superadmin']:
                     return redirect(url_for('views.admindashboard'))
                 else:
                     return redirect(url_for('views.dashboard'))
@@ -48,11 +48,11 @@ def logout():
     return redirect(url_for('auth.login'))
 
 @auth.route('/sing_up', methods=['GET', 'POST'])
-@tipo_usuario_aceptado('admin')
+@tipo_usuario_aceptado('superadmin')
 def sign_up():
     tablaUsers = User.query.all()
     
-    areUser = User.query.filter_by(tipo='user').all()
+    areUser = User.query.filter(User.tipo.in_(['user', 'admin'])).all()
     if areUser:
         permitsUser = Permit.query.all()
         mappermits = {}
@@ -76,7 +76,7 @@ def sign_up():
                            permitMapas=files, mappermits = mappermits)
 
 @auth.route("/new_user", methods=['POST'])
-@tipo_usuario_aceptado('admin')
+@tipo_usuario_aceptado('superadmin')
 def new_user():
     if request.method == 'POST':
         email = request.form.get('email')
@@ -119,7 +119,7 @@ def new_user():
 
 @auth.route('/delete_user/<string:id>', methods=['GET','POST'])
 @login_required
-@tipo_usuario_aceptado('admin')
+@tipo_usuario_aceptado('superadmin')
 def delete_user(id):
     usuario = User.query.filter_by(id = id).first()
     if usuario:
@@ -133,7 +133,7 @@ def delete_user(id):
 
 @auth.route('/edit_user/<string:id>', methods=['GET', 'POST'])
 @login_required
-@tipo_usuario_aceptado('admin')
+@tipo_usuario_aceptado('superadmin')
 def edit_user(id):
     usuario = User.query.filter_by(id = id).first()
     
@@ -141,7 +141,7 @@ def edit_user(id):
 
 @auth.route('/update_user/<string:id>', methods=['POST'])
 @login_required
-@tipo_usuario_aceptado('admin')
+@tipo_usuario_aceptado('superadmin')
 def update_user(id):
     if request.method == 'POST':
         usuario = User.query.get(id)
@@ -160,14 +160,14 @@ def update_user(id):
 # Demo para eliminar solamente si tiene la clave para eliminar (not functioning)
 @auth.route('/verificar_clave/<id>', methods=['GET', 'POST'])
 @login_required
-@tipo_usuario_aceptado('admin')
+@tipo_usuario_aceptado('superadmin')
 def verificar_clave(id):
     clave_correcta = request.form.get('clave') == 'saos1234'
     return jsonify({'success': clave_correcta})
         
 @auth.route('/edit_permits', methods=['POST'])
 @login_required
-@tipo_usuario_aceptado('admin')
+@tipo_usuario_aceptado('superadmin')
 def edit_permits(): 
     if request.method == 'POST':
         id =  request.form.get('btnId')
@@ -192,7 +192,7 @@ def edit_permits():
     return redirect('/sing_up?tab=permisos')
 
 @auth.route("/new_cashflow", methods=['POST'])
-@tipo_usuario_aceptado('admin')
+@tipo_usuario_aceptado('superadmin')
 def new_cashflow():
     if request.method == 'POST':
         email = request.form.get('email')
